@@ -1,21 +1,22 @@
-#include "common.hpp"
+#include "common.h"
 
-#include <three/cameras/perspective_camera.hpp>
-#include <three/core/geometry.hpp>
-#include <three/materials/particle_basic_material.hpp>
-#include <three/objects/particle_system.hpp>
-#include <three/renderers/renderer_parameters.hpp>
-#include <three/renderers/gl_renderer.hpp>
-#include <three/scenes/fog_exp2.hpp>
+#include "three/cameras/perspective_camera.h"
+#include "three/core/geometry.h"
+#include "three/materials/particle_system_material.h"
+#include "three/objects/particle_system.h"
+#include "three/renderers/renderer_parameters.h"
+#include "three/renderers/gl_renderer.h"
+#include "three/scenes/fog_exp2.h"
 
 using namespace three;
+using namespace three_examples;
 
-void particles_random( const GLRenderer::Ptr& renderer ) {
+void particles_random( GLWindow& window, GLRenderer& renderer ) {
 
   auto camera = PerspectiveCamera::create(
-    75, ( float )renderer->width() / renderer->height(), 1.f, 3000
+    75, ( float )renderer.width() / renderer.height(), 1.f, 3000
   );
-  camera->position.z = 1000;
+  camera->position().z = 1000;
 
   auto scene = Scene::create();
   scene->fog = FogExp2::create( 0x000000, .0007f );
@@ -33,29 +34,29 @@ void particles_random( const GLRenderer::Ptr& renderer ) {
   auto addParticleSystem = [&]( const Vector3& color, float size ) {
 
     //materials[i] = new THREE.ParticleBasicMaterial( { color: color, size: size } );
-    auto material = ParticleBasicMaterial::create(
-      Material::Parameters().add( "size", size * .5f )
+    auto material = ParticleSystemMaterial::create(
+      Material::Parameters().add( "size", size )
     );
 
     materials.push_back( material );
-    material->color.setHSV( color[0], color[1], color[2] );
+    material->color.setHSL( color[0], color[1], color[2] );
 
     auto particles = ParticleSystem::create( geometry, material );
 
-    particles->rotation.x = Math::random() * 6;
-    particles->rotation.y = Math::random() * 6;
-    particles->rotation.z = Math::random() * 6;
+    particles->rotation() = Euler( Math::random() * 6,
+                                   Math::random() * 6,
+                                   Math::random() * 6 );
 
     scene->add( particles );
   };
 
   typedef std::pair<Vector3, float> ColorSize;
   std::array<ColorSize, 5> params = {
-    ColorSize( Vector3(  1.f, 1.f, 1.f), 5.f ),
-    ColorSize( Vector3(0.95f, 1.f, 1.f), 4.f ),
-    ColorSize( Vector3(0.90f, 1.f, 1.f), 3.f ),
-    ColorSize( Vector3(0.85f, 1.f, 1.f), 2.f ),
-    ColorSize( Vector3(0.80f, 1.f, 1.f), 1.f )
+    ColorSize( Vector3(  1.f, 1.f, 0.5f), 5.f ),
+    ColorSize( Vector3(0.95f, 1.f, 0.5f), 4.f ),
+    ColorSize( Vector3(0.90f, 1.f, 0.5f), 3.f ),
+    ColorSize( Vector3(0.85f, 1.f, 0.5f), 2.f ),
+    ColorSize( Vector3(0.80f, 1.f, 0.5f), 1.f )
   };
 
   for ( const auto& param : params ) {
@@ -64,66 +65,47 @@ void particles_random( const GLRenderer::Ptr& renderer ) {
 
   /////////////////////////////////////////////////////////////////////////
 
-  auto running = true, renderStats = true;
-  sdl::addEventListener( SDL_KEYDOWN, [&]( const sdl::Event& e ) {
-    switch (e.key.keysym.sym) {
-    case SDLK_q:
-    case SDLK_ESCAPE:
-      running = false; break;
-    default:
-      renderStats = !renderStats; break;
-    };
-  } );
-
-  sdl::addEventListener( SDL_QUIT, [&]( const sdl::Event& ) {
-    running = false;
-  } );
-
   auto mouseX = 0.f, mouseY = 0.f;
-  sdl::addEventListener( SDL_MOUSEMOTION, [&]( const sdl::Event & event ) {
-    mouseX = 2.f * ( ( float )event.motion.x / renderer->width()  - 0.5f );
-    mouseY = 2.f * ( ( float )event.motion.y / renderer->height() - 0.5f );
+  window.addEventListener( SDL_MOUSEMOTION, [&]( const SDL_Event& event ) {
+    mouseX = 2.f * ( ( float )event.motion.x / renderer.width()  - 0.5f );
+    mouseY = 2.f * ( ( float )event.motion.y / renderer.height() - 0.5f );
   } );
 
-  sdl::addEventListener( SDL_VIDEORESIZE, [&]( const sdl::Event event ) {
-    camera->aspect = ( float )event.resize.w / event.resize.h;
+  window.addEventListener( SDL_WINDOWEVENT, [&]( const SDL_Event& event ) {
+    if (event.window.event != SDL_WINDOWEVENT_RESIZED) return;
+    camera->aspect = ( float )event.window.data1 / event.window.data2;
     camera->updateProjectionMatrix();
-    renderer->setSize( event.resize.w, event.resize.h );
+    renderer.setSize( event.window.data1, event.window.data2 );
   } );
 
   /////////////////////////////////////////////////////////////////////////
 
-  stats::Stats stats( *renderer );
   auto time = 0.f;
 
-  anim::gameLoop(
-
-  [&]( float dt ) -> bool {
+  window.animate( [&]( float dt ) -> bool {
 
     time += dt * .05f;
 
-    camera->position.x += ( -1000.f * mouseX - camera->position.x ) * 3 * dt;
-    camera->position.y += (  1000.f * mouseY - camera->position.y ) * 3 * dt;
-    camera->lookAt( scene->position );
+    camera->position().x += ( -1000.f * mouseX - camera->position().x ) * 3 * dt;
+    camera->position().y += (  1000.f * mouseY - camera->position().y ) * 3 * dt;
+    camera->lookAt( scene->position() );
 
     for ( size_t i = 0; i < scene->children.size(); ++i ) {
       auto& object = *scene->children[ i ];
       if ( object.type() == THREE::ParticleSystem ) {
-        object.rotation.y = time * ( i < 4 ? i + 1 : - ( (int)i + 1 ) );
+        object.rotation().y = time * ( i < 4 ? i + 1 : - ( (int)i + 1 ) );
       }
     }
 
     for ( size_t i = 0; i < materials.size(); ++i ) {
       auto& color = params[ i ].first;
       const auto h = Math::fmod( 360.f * ( color[0] + time ), 360.f ) / 360.f;
-      materials[ i ]->color.setHSV( h, color[ 1 ], color[ 2 ] );
+      materials[ i ]->color.setHSL( h, color[ 1 ], color[ 2 ] );
     }
 
-    renderer->render( *scene, *camera );
+    renderer.render( *scene, *camera );
 
-    stats.update( dt, renderStats );
-
-    return running;
+    return true;
 
   } );
 
@@ -131,19 +113,6 @@ void particles_random( const GLRenderer::Ptr& renderer ) {
 
 int main( int argc, char* argv[] ) {
 
-  auto onQuit = defer( sdl::quit );
+  return RunExample( particles_random );
 
-  RendererParameters parameters;
-  if ( !sdl::init( parameters ) || !glew::init( parameters ) ) {
-    return 0;
-  }
-
-  auto renderer = GLRenderer::create( parameters );
-  if ( !renderer ) {
-    return 0;
-  }
-
-  particles_random( renderer );
-
-  return 0;
 }

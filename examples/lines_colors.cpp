@@ -1,17 +1,18 @@
-#include "common.hpp"
+#include "common.h"
 
-#include <three/cameras/perspective_camera.hpp>
-#include <three/core/geometry.hpp>
-#include <three/lights/point_light.hpp>
-#include <three/materials/line_basic_material.hpp>
-#include <three/objects/line.hpp>
-#include <three/renderers/renderer_parameters.hpp>
-#include <three/renderers/gl_renderer.hpp>
-#include <three/scenes/fog.hpp>
+#include "three/cameras/perspective_camera.h"
+#include "three/core/geometry.h"
+#include "three/lights/point_light.h"
+#include "three/materials/line_basic_material.h"
+#include "three/objects/line.h"
+#include "three/renderers/renderer_parameters.h"
+#include "three/renderers/gl_renderer.h"
+#include "three/scenes/fog.h"
 
 #include <array>
 
 using namespace three;
+using namespace three_examples;
 
 std::vector<Vector3> hilbert3D( Vector3 center,
                                 float side,
@@ -60,14 +61,14 @@ std::vector<Vector3> hilbert3D( Vector3 center,
 
 /////////////////////////////////////////////////////////////////////////
 
-void lines_colors( GLRenderer::Ptr renderer ) {
+void lines_colors( GLWindow& window, GLRenderer& renderer ) {
 
-  renderer->sortObjects = false;
+  renderer.sortObjects = false;
 
   auto camera = PerspectiveCamera::create(
-    33, (float)renderer->width() / renderer->height(), 1, 10000
+    33, (float)renderer.width() / renderer.height(), 1, 10000
   );
-  camera->position.z = 700;
+  camera->position().z = 700;
 
   auto geometry  = Geometry::create(),
        geometry2 = Geometry::create(),
@@ -83,13 +84,13 @@ void lines_colors( GLRenderer::Ptr renderer ) {
     geometry->vertices.push_back( point );
 
     colors.push_back( Color( 0xffffff ) );
-    colors.back().setHSV( 0.6f, ( 200.f + point.x ) / 400, 1.f );
+    colors.back().setHSL( 0.6f, 1.f, std::max( 0.f, ( 200.f - point.x ) / 400 ) * 0.5f + 0.5f );
 
     colors2.push_back( Color( 0xffffff ) );
-    colors2.back().setHSV( 0.3f, 1.0f, ( 200.f + point.x ) / 400 );
+    colors2.back().setHSL( 0.3f, 1.0f, std::max( 0.f, ( 200.f + point.x ) / 400 ) * 0.5f );
 
     colors3.push_back( Color( 0xffffff ) );
-    colors3.back().setHSV( (float)i++ / points.size(), 1.0f, 1.0f );
+    colors3.back().setHSL( (float)i++ / points.size(), 1.0f, 0.5f );
 
   }
 
@@ -113,8 +114,8 @@ void lines_colors( GLRenderer::Ptr renderer ) {
 
   auto addLine = [&scene]( Vector3 pos, float scale, Geometry::Ptr geometry, Material::Ptr material ) {
     auto line = Line::create( geometry, material );
-    line->scale.x = line->scale.y = line->scale.z = scale;
-    line->position = pos;
+    line->scale() = Vector3( scale );
+    line->position() = pos;
     scene->add( line );
   };
 
@@ -125,74 +126,39 @@ void lines_colors( GLRenderer::Ptr renderer ) {
 
   //////////////////////////////////////////////////////////////////////////
 
-  auto running = true, renderStats = true;
-  sdl::addEventListener( SDL_KEYDOWN, [&]( const sdl::Event& e ) {
-    switch (e.key.keysym.sym) {
-    case SDLK_q:
-    case SDLK_ESCAPE:
-      running = false; break;
-    default:
-      renderStats = !renderStats; break;
-    };
-  } );
-
-  sdl::addEventListener( SDL_QUIT, [&]( const sdl::Event& ) {
-    running = false;
-  } );
-
   auto mouseX = 0.f, mouseY = 0.f;
-  sdl::addEventListener(SDL_MOUSEMOTION, [&]( const sdl::Event& event ) {
-    mouseX = 2.f * ((float)event.motion.x / renderer->width()  - 0.5f);
-    mouseY = 2.f * ((float)event.motion.y / renderer->height() - 0.5f);
+  window.addEventListener(SDL_MOUSEMOTION, [&]( const SDL_Event& event ) {
+    mouseX = 2.f * ((float)event.motion.x / renderer.width()  - 0.5f);
+    mouseY = 2.f * ((float)event.motion.y / renderer.height() - 0.5f);
   });
 
   //////////////////////////////////////////////////////////////////////////
 
-  stats::Stats stats( *renderer );
   auto time = 0.f;
 
-  anim::gameLoop(
+  window.animate( [&]( float dt ) -> bool {
 
-    [&]( float dt ) -> bool {
+    time += dt;
 
-      time += dt;
+    camera->position().x += ( -500.f * mouseX - camera->position().x ) * 3 * dt;
+    camera->position().y += (  500.f * mouseY - camera->position().y ) * 3 * dt;
+    camera->lookAt( scene->position() );
 
-      camera->position.x += ( -500.f * mouseX - camera->position.x ) * 3 * dt;
-      camera->position.y += (  500.f * mouseY - camera->position.y ) * 3 * dt;
-      camera->lookAt( scene->position );
-
-      for ( size_t i = 0; i < scene->children.size(); i++ ) {
-        if (scene->children[i]->type() == THREE::Line )
-          scene->children[i]->rotation.y = time * ( i % 2 ? 1 : -1);
-      }
-
-      renderer->render( *scene, *camera );
-
-      stats.update( dt, renderStats );
-
-      return running;
-
+    for ( size_t i = 0; i < scene->children.size(); i++ ) {
+      if (scene->children[i]->type() == THREE::Line )
+        scene->children[i]->rotation(). y = time * ( i % 2 ? 1 : -1);
     }
 
-  );
+    renderer.render( *scene, *camera );
+
+    return true;
+
+  } );
 
 }
 
 int main ( int argc, char* argv[] ) {
 
-  auto onQuit = defer( sdl::quit );
+  return RunExample( lines_colors );
 
-  RendererParameters parameters;
-  if ( !sdl::init( parameters ) || !glew::init( parameters ) ) {
-    return 0;
-  }
-
-  auto renderer = GLRenderer::create( parameters );
-  if ( !renderer ) {
-    return 0;
-  }
-
-  lines_colors( renderer );
-
-  return 0;
 }

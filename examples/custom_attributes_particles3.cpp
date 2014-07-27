@@ -1,29 +1,30 @@
-#include "common.hpp"
+#include "common.h"
 
-#include <three/core/geometry.hpp>
-#include <three/cameras/perspective_camera.hpp>
-#include <three/extras/image_utils.hpp>
-#include <three/objects/mesh.hpp>
-#include <three/materials/shader_material.hpp>
-#include <three/materials/mesh_face_material.hpp>
-#include <three/objects/particle_system.hpp>
-#include <three/renderers/renderer_parameters.hpp>
-#include <three/renderers/gl_renderer.hpp>
+#include "three/core/geometry.h"
+#include "three/cameras/perspective_camera.h"
+#include "three/extras/image_utils.h"
+#include "three/objects/mesh.h"
+#include "three/materials/shader_material.h"
+#include "three/materials/mesh_face_material.h"
+#include "three/objects/particle_system.h"
+#include "three/renderers/renderer_parameters.h"
+#include "three/renderers/gl_renderer.h"
 
-#include <three/extras/geometries/cube_geometry.hpp>
-#include <three/extras/geometries/sphere_geometry.hpp>
-#include <three/extras/geometry_utils.hpp>
+#include "three/extras/geometries/cube_geometry.h"
+#include "three/extras/geometries/sphere_geometry.h"
+#include "three/extras/geometry_utils.h"
 
 const std::string vertexShader =
 "attribute float size;\n"
 "attribute vec4 ca;\n"
 "varying vec4 vColor;\n"
 "void main() {\n"
-"  vColor = ca;\n"
-"  vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );\n"
-"  gl_PointSize = size * ( 150.0 / length( mvPosition.xyz ) );\n"
-"  gl_Position = projectionMatrix * mvPosition;\n"
+"    vColor = ca;\n"
+"    vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );\n"
+"    gl_PointSize = size * ( 150.0 / length( mvPosition.xyz ) );\n"
+"    gl_Position = projectionMatrix * mvPosition;\n"
 "}\n";
+
 
 const std::string fragmentShader =
 "uniform vec3 color;\n"
@@ -40,13 +41,14 @@ const std::string fragmentShader =
 "}\n";
 
 using namespace three;
+using namespace three_examples;
 
-void custom_attributes_particles3( GLRenderer::Ptr renderer ) {
+void custom_attributes_particles3( GLWindow& window, GLRenderer& renderer ) {
 
  auto camera = PerspectiveCamera::create(
-    40, ( float )renderer->width() / renderer->height(), 1, 1000
+    40, ( float )renderer.width() / renderer.height(), 1, 1000
   );
-  camera->position.z = 500;
+  camera->position().z = 500;
 
   auto scene = Scene::create();
 
@@ -99,9 +101,8 @@ void custom_attributes_particles3( GLRenderer::Ptr renderer ) {
 
   auto addGeo = [&]( const Geometry::Ptr& geo, float x, float y, float z, float ry ) {
     auto m = Mesh::create( geo, dummyMaterial );
-    m->position.set( x, y, z );
-    m->rotation.y = ry;
-
+    m->position().set( x, y, z );
+    m->rotation().y = ry;
     GeometryUtils::merge( *geometry, *m );
   };
 
@@ -145,14 +146,14 @@ void custom_attributes_particles3( GLRenderer::Ptr renderer ) {
 
     if ( v < vc1 ) {
       valuesSize[ v ] = 10;
-      valuesColor[ v ].setHSV( 0.5f  + 0.2f * ( (float)v / vc1 ),
-                               0.99f,
-                               1.f );
+      valuesColor[ v ].setHSL( 0.5f  + 0.2f * ( (float)v / vc1 ),
+                               1.f,
+                               0.5f );
     } else {
       valuesSize[ v ] = 55;
-      valuesColor[ v ].setHSV( 0.1f,
-                               0.99f,
-                               1.f );
+      valuesColor[ v ].setHSL( 0.1f,
+                               1.f,
+                               0.5f );
     }
 
   }
@@ -167,37 +168,22 @@ void custom_attributes_particles3( GLRenderer::Ptr renderer ) {
 
   /////////////////////////////////////////////////////////////////////////
 
-  auto running = true, renderStats = true;
-  sdl::addEventListener( SDL_KEYDOWN, [&]( const sdl::Event& e ) {
-    switch (e.key.keysym.sym) {
-    case SDLK_q:
-    case SDLK_ESCAPE:
-      running = false; break;
-    default:
-      renderStats = !renderStats; break;
-    };
-  } );
-
-  sdl::addEventListener( SDL_QUIT, [&]( const sdl::Event& ) {
-    running = false;
-  } );
-
-  sdl::addEventListener( SDL_VIDEORESIZE, [&]( const sdl::Event event ) {
-    camera->aspect = ( float )event.resize.w / event.resize.h;
+  window.addEventListener( SDL_WINDOWEVENT, [&]( const SDL_Event& event ) {
+    if (event.window.event != SDL_WINDOWEVENT_RESIZED) return;
+    camera->aspect = ( float )event.window.data1 / event.window.data2;
     camera->updateProjectionMatrix();
-    renderer->setSize( event.resize.w, event.resize.h );
+    renderer.setSize( event.window.data1, event.window.data2 );
   } );
 
   /////////////////////////////////////////////////////////////////////////
 
-  stats::Stats stats( *renderer );
-
   auto time = 0.f;
 
-  anim::gameLoop( [&]( float dt ) -> bool {
+  window.animate( [&]( float dt ) -> bool {
 
     time += dt;
-    object->rotation.y = object->rotation.z = time * .3f;
+    object->rotation().y = 0.02f * time;
+    object->rotation().z = 0.02f * time;
 
     auto& sizes = size.value.cast<std::vector<float>>();
     for( size_t i = 0; i < sizes.size(); i++ ) {
@@ -206,35 +192,21 @@ void custom_attributes_particles3( GLRenderer::Ptr renderer ) {
     }
     size.needsUpdate = true;
 
-    renderer->render( *scene, *camera );
+    renderer.render( *scene, *camera );
 
-    stats.update( dt, renderStats );
+    return true;
 
-    return running;
-
-  }, 2000 );
+  } );
 
 }
 
 int main( int argc, char* argv[] ) {
-
-  auto onQuit = defer( sdl::quit );
 
   RendererParameters parameters;
   parameters.clearColor = Color( 0x000000 );
   parameters.clearAlpha = 1.f;
   parameters.vsync = false;
 
-  if ( !sdl::init( parameters ) || !glew::init( parameters ) ) {
-    return 0;
-  }
+  return RunExample( custom_attributes_particles3, parameters );
 
-  auto renderer = GLRenderer::create( parameters );
-  if ( !renderer ) {
-    return 0;
-  }
-
-  custom_attributes_particles3( renderer );
-
-  return 0;
 }

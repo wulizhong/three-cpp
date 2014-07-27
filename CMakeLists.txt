@@ -3,6 +3,7 @@ project(three)
 
 set(CMAKE_DEBUG_POSTFIX "d")
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+set(EXT_PROJECTS_DIR ${PROJECT_SOURCE_DIR}/externals)
 
 include(${PROJECT_SOURCE_DIR}/cmake/ThreeTargets.cmake)
 
@@ -11,8 +12,7 @@ dissect_version()
 
 set(THREE_TREAT_WARNINGS_AS_ERRORS TRUE CACHE BOOL "Treat warnings as errors")
 set(THREE_BUILD_EXAMPLES     TRUE CACHE BOOL "Build three.cpp examples")
-#set(THREE_BUILD_TESTS        FALSE CACHE BOOL "Build three.cpp unit tests")
-set(THREE_HEADER_ONLY        FALSE CACHE BOOL "Whether to use three.cpp as a header-only library")
+set(THREE_BUILD_TESTS        FALSE CACHE BOOL "Build three.cpp unit tests")
 set(THREE_LIBRARY_STATIC     TRUE CACHE BOOL "If building three.cpp as a library, build statically")
 
 IF(NOT CMAKE_BUILD_TYPE)
@@ -31,19 +31,23 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   set(CMAKE_COMPILER_IS_CLANGXX 1)
 endif ()
 
-if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX)
-  if (MINGW)
-    set(THREE_BUILD_64_BIT FALSE CACHE BOOL "Enable 64-bit build")
-  else()
-    set(THREE_BUILD_64_BIT TRUE CACHE BOOL "Enable 64-bit build")
-  endif()
+set(THREE_CXX_FLAGS "" CACHE INTERNAL "" FORCE)
 
-  if (THREE_BUILD_64_BIT)
-    set(THREE_COMMON_FLAGS "-m64" CACHE INTERNAL "Common flags" FORCE)
-    set(THREE_SIZE_TYPE x64 CACHE INTERNAL "" FORCE)
-  else()
-    set(THREE_COMMON_FLAGS "-m32" CACHE INTERNAL "Common flags" FORCE)
-    set(THREE_SIZE_TYPE x86 CACHE INTERNAL "" FORCE)
+if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX)
+  if (NOT ANDROID)
+    if (MINGW)
+      set(THREE_BUILD_64_BIT FALSE CACHE BOOL "Enable 64-bit build")
+    else()
+      set(THREE_BUILD_64_BIT TRUE CACHE BOOL "Enable 64-bit build")
+    endif()
+
+    if (THREE_BUILD_64_BIT)
+      set(THREE_COMMON_FLAGS "-m64" CACHE INTERNAL "Common flags" FORCE)
+      set(THREE_SIZE_TYPE x64 CACHE INTERNAL "" FORCE)
+    else()
+      set(THREE_COMMON_FLAGS "-m32" CACHE INTERNAL "Common flags" FORCE)
+      set(THREE_SIZE_TYPE x86 CACHE INTERNAL "" FORCE)
+    endif()
   endif()
 
   set(THREE_COMMON_FLAGS "${THREE_COMMON_FLAGS} -Wall -Wno-missing-braces -Wno-unused-private-field")
@@ -62,17 +66,17 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLAN
   endif()
 
   if (CMAKE_COMPILER_IS_CLANGXX)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -std=c++0x")
-  elseif (MINGW)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+    set(THREE_CXX_FLAGS "-stdlib=libc++ -std=c++11")
+  elseif (MINGW OR ANDROID)
+    set(THREE_CXX_FLAGS "-std=c++11")
     add_definitions("-D_GLIBCXX_USE_NANOSLEEP")
   else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+    set(THREE_CXX_FLAGS "-std=c++0x")
     add_definitions("-D_GLIBCXX_USE_NANOSLEEP")
   endif()
 
   set(CMAKE_C_FLAGS             "${CMAKE_C_FLAGS}             ${THREE_COMMON_FLAGS}")
-  set(CMAKE_CXX_FLAGS           "${CMAKE_CXX_FLAGS}           ${THREE_COMMON_FLAGS}")
+  set(CMAKE_CXX_FLAGS           "${CMAKE_CXX_FLAGS}           ${THREE_COMMON_FLAGS} ${THREE_CXX_FLAGS}")
   set(CMAKE_EXE_LINKER_FLAGS    "${CMAKE_EXE_LINKER_FLAGS}    ${THREE_COMMON_FLAGS}")
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${THREE_COMMON_FLAGS}")
   set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${THREE_COMMON_FLAGS}")
@@ -100,7 +104,10 @@ if(MSVC)
     set(THREE_BUILD_64_BIT TRUE CACHE INTERNAL "" FORCE)
   endif()
 
-  add_definitions("-D_VARIADIC_MAX=6")
+  if (MSVC_VERSION EQUAL 1700)
+    add_definitions("-D_VARIADIC_MAX=10")
+  endif()
+
   add_definitions("-D_CRT_SECURE_NO_WARNINGS")
 
   set(THREE_LINK_STATIC_RUNTIME OFF CACHE BOOL "Link statically against C++ runtime")
@@ -155,114 +162,59 @@ set(EXTERNALS_DIR ${CMAKE_HOME_DIRECTORY}/externals)
 
 include_directories(.)
 
-if ((NOT THREE_HEADER_ONLY) OR THREE_BUILD_EXAMPLES)
-
-  # Locate necessary headers/libraries
-
-  set(CMAKE_PREFIX_PATH ${EXTERNALS_DIR}/rapidjson ${CMAKE_PREFIX_PATH})
-
-  set(SDL_ROOT "" CACHE PATH
-    "The location of the SDL install prefix (only used if the SDL is not yet found)")
-  if(SDL_ROOT)
-    set(CMAKE_PREFIX_PATH ${SDL_ROOT} ${CMAKE_PREFIX_PATH})
-  elseif(MSVC)
-    set(CMAKE_PREFIX_PATH ${EXTERNALS_DIR}/sdl-1.2.15/msvc ${CMAKE_PREFIX_PATH})
-  elseif(MINGW)
-    set(CMAKE_PREFIX_PATH ${EXTERNALS_DIR}/sdl-1.2.15/mingw ${CMAKE_PREFIX_PATH})
-  endif()
-
-  find_package(SDL REQUIRED)
-  find_package(OpenGL REQUIRED)
-  find_package(RapidJSON REQUIRED)
-
-  if (NOT WIN32)
-    find_package(GLEW REQUIRED)
-  else()
-    # Locating GLEW on Windows isn't worth it... just build it
-    add_subdirectory(externals/glew-1.9.0)
-    if (THREE_STATIC_GLEW)
-      set(GLEW_LIBRARY glews CACHE INTERNAL "" FORCE)
-    else()
-      set(GLEW_LIBRARY glew CACHE INTERNAL "" FORCE)
-    endif()
-  endif()
-
-  set(THREE_STATIC_GLEW OFF CACHE BOOL "Use static glew library")
-  set(THREE_DEP_LIBS ${GLEW_LIBRARY} ${OPENGL_LIBRARIES} ${SDL_LIBRARY})
-  include_directories(${GLEW_INCLUDE_DIR})
-  include_directories(${SDL_INCLUDE_DIR})
-  include_directories(${RAPID_JSON_INCLUDE_DIR})
-
-  # TODO: Remove explicit sdl/glew dependencies
-  add_definitions(-DTHREE_SDL -DTHREE_GLEW)
-  if (THREE_STATIC_GLEW)
-    add_definitions(-DGLEW_STATIC)
-  endif()
-
-  ## TODO: Remove hard-wired data directory path
-  set(THREE_RELEASE_BUILD FALSE CACHE BOOL
-    "Whether to compile examples for installation (changes data dir from absolute to relative reference")
-  set(DATA_DIR ${CMAKE_HOME_DIRECTORY}/data)
-  if (THREE_RELEASE_BUILD)
-    add_definitions(-DTHREE_DATA_DIR=".")
-  else()
-    add_definitions(-DTHREE_DATA_DIR="${DATA_DIR}")
-  endif()
-
+if (NOT THREE_LIBRARY_STATIC)
+  add_definitions(-DTHREE_DYN_LINK)
 endif()
 
-#############
-
-# Copy SDL runtime on Windows
-if (MSVC OR MINGW)
-  if ((NOT THREE_HEADER_ONLY) OR THREE_BUILD_EXAMPLES OR THREE_BUILD_TESTS)
-    get_filename_component(SDL_PATH ${SDLMAIN_LIBRARY} PATH)
-    set(SDL_RUNTIME_LIBRARY "${SDL_PATH}/SDL.dll" CACHE INTERNAL "" FORCE)
-    message (STATUS "Copying ${SDL_RUNTIME_LIBRARY} to ${THREE_BINARY_PATH} \n")
-    set(THREE_DEPENDS three_depends)
-    if (MSVC)
-      #add_custom_command(
-      add_custom_target(
-        ${THREE_DEPENDS}
-        COMMAND ${CMAKE_COMMAND} -E make_directory "${THREE_BINARY_PATH}/$<CONFIGURATION>"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${SDL_RUNTIME_LIBRARY} "${THREE_BINARY_PATH}/$<CONFIGURATION>"
-        COMMENT "Copying ${SDL_RUNTIME_LIBRARY}")
-    else()
-      add_custom_target(
-        ${THREE_DEPENDS}
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${THREE_BINARY_PATH}
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${SDL_RUNTIME_LIBRARY} "${THREE_BINARY_PATH}"
-        COMMENT "Copying ${SDL_RUNTIME_LIBRARY}")
-    endif()
-  endif()
+if (ANDROID)
+  add_definitions(-DTHREE_GLES)
 endif()
 
-if (NOT THREE_HEADER_ONLY)
-  add_definitions(-DTHREE_SEPARATE_COMPILATION)
-  if (NOT THREE_LIBRARY_STATIC)
-    add_definitions(-DTHREE_DYN_LINK)
-  endif()
+# TODO Refactor, add groupings, etc
+file(GLOB_RECURSE THREE_SOURCES three/*.cpp)
+file(GLOB_RECURSE THREE_HEADERS three/*.h)
 
-  if(${CMAKE_GENERATOR} STREQUAL Xcode)
-     add_library(xcode_sdlmain STATIC externals/sdl-1.2.15/xcode/SDLMain.m)
-     set(SDLMAIN_LIBRARY xcode_sdlmain)
-  endif()
-  
-  set(THREE_LIB_SOURCE_FILES three/impl/src.cpp three/impl/src_extras.cpp)
+set(THREE_LIB_SOURCE_FILES ${THREE_SOURCES} ${THREE_HEADERS})
 
-  set(THREE_LIB three)
-  three_add_library(${THREE_LIB} ${THREE_LIB_SOURCE_FILES})
-
-endif()
-
-#############
+set(THREE_LIB three)
+three_add_library(${THREE_LIB} ${THREE_LIB_SOURCE_FILES})
+set_target_properties(${THREE_LIB} PROPERTIES COMPILE_DEFINITIONS "THREE_SOURCE")
 
 if(THREE_BUILD_EXAMPLES)
   add_subdirectory(examples)
 endif()
 
-#if(THREE_BUILD_TESTS)
-#  include_directories(${THREE_SOURCE_DIR}/tests)
-#  add_subdirectory(externals/googletest)
-#  add_subdirectory(tests)
-#endif()
+if(THREE_BUILD_TESTS)
+  add_subdirectory(${EXT_PROJECTS_DIR}/googletest)
+
+  enable_testing()
+  include_directories(${GTEST_INCLUDE_DIR} ${COMMON_INCLUDES})
+
+  file(GLOB_RECURSE TEST_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp)
+  file(GLOB_RECURSE TEST_SRC_FILES ${TEST_SRC_FILES} ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.h)
+
+  add_executable(three_test ${TEST_SRC_FILES})
+  add_dependencies(three_test googletest)
+  add_dependencies(three_test three)
+  if(MSVC)
+    target_link_libraries(three_test
+      debug ${GTEST_LIBS_DIR}/DebugLibs/${CMAKE_FIND_LIBRARY_PREFIXES}gtest${CMAKE_FIND_LIBRARY_SUFFIXES}
+      optimized ${GTEST_LIBS_DIR}/ReleaseLibs/${CMAKE_FIND_LIBRARY_PREFIXES}gtest${CMAKE_FIND_LIBRARY_SUFFIXES}
+    )
+    target_link_libraries(three_test
+      debug ${GTEST_LIBS_DIR}/DebugLibs/${CMAKE_FIND_LIBRARY_PREFIXES}gtest_main${CMAKE_FIND_LIBRARY_SUFFIXES}
+      optimized ${GTEST_LIBS_DIR}/ReleaseLibs/${CMAKE_FIND_LIBRARY_PREFIXES}gtest_main${CMAKE_FIND_LIBRARY_SUFFIXES}
+    )
+  else()
+    target_link_libraries(three_test
+      debug ${GTEST_LIBS_DIR}/DebugLibs/libgtest.a
+      optimized ${GTEST_LIBS_DIR}/ReleaseLibs/libgtest.a
+    )
+    target_link_libraries(three_test
+      debug ${GTEST_LIBS_DIR}/DebugLibs/libgtest_main.a
+      optimized ${GTEST_LIBS_DIR}/ReleaseLibs/libgtest_main.a
+    )
+  endif()
+  target_link_libraries(three_test ${THREE_LIB})
+  add_test(threetest ${THREE_BINARY_PATH}/three_tests -V)
+endif()

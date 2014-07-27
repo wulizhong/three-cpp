@@ -1,5 +1,6 @@
 *.sublime-workspace
 *.sublime-project
 bin/
-build/
+*build*/
 lib/
+.DS_Store

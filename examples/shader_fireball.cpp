@@ -1,12 +1,12 @@
-#include "common.hpp"
+#include "common.h"
 
-#include <three/core/geometry.hpp>
-#include <three/cameras/perspective_camera.hpp>
-#include <three/objects/mesh.hpp>
-#include <three/extras/geometries/sphere_geometry.hpp>
-#include <three/materials/shader_material.hpp>
-#include <three/renderers/renderer_parameters.hpp>
-#include <three/renderers/gl_renderer.hpp>
+#include "three/core/geometry.h"
+#include "three/cameras/perspective_camera.h"
+#include "three/objects/mesh.h"
+#include "three/extras/geometries/sphere_geometry.h"
+#include "three/materials/shader_material.h"
+#include "three/renderers/renderer_parameters.h"
+#include "three/renderers/gl_renderer.h"
 
 const std::string vertexShader =
 "\
@@ -121,13 +121,14 @@ void main( void ) {\
 ";
 
 using namespace three;
+using namespace three_examples;
 
-void shader_fireball( GLRenderer::Ptr renderer ) {
+void shader_fireball( GLWindow& window, GLRenderer& renderer ) {
 
   auto camera = PerspectiveCamera::create(
-    40, (float)renderer->width() / renderer->height(), 1, 3000
+    40, (float)renderer.width() / renderer.height(), 1, 3000
   );
-  camera->position.z = 4;
+  camera->position().z = 4;
 
   auto scene = Scene::create();
 
@@ -144,31 +145,21 @@ void shader_fireball( GLRenderer::Ptr renderer ) {
   auto mesh = Mesh::create( SphereGeometry::create( 0.75f, 64, 32 ), material );
   scene->add( mesh );
 
-  renderer->setClearColorHex( 0x050505, 0 );
+  renderer.setClearColor( Color(0x050505), 0 );
 
   /////////////////////////////////////////////////////////////////////////
 
-  auto running = true;
-  sdl::addEventListener(SDL_KEYDOWN, [&]( const sdl::Event& ) {
-    running = false;
-  });
-  sdl::addEventListener(SDL_QUIT, [&]( const sdl::Event& ) {
-    running = false;
-  });
-
-  /////////////////////////////////////////////////////////////////////////
-
-  anim::gameLoop( [&]( float dt ) -> bool {
+  window.animate( [&]( float dt ) -> bool {
 
     time += dt;
     material->uniforms[ "time" ].value = time;
 
-    mesh->rotation.y += 0.5f * dt;
-    mesh->rotation.x += 0.1f * dt;
+    mesh->rotation().x += 0.1f * dt;
+    mesh->rotation().y += 0.5f * dt;
 
-    renderer->render( *scene, *camera );
+    renderer.render( *scene, *camera );
 
-    return running;
+    return true;
 
   } );
 
@@ -176,20 +167,6 @@ void shader_fireball( GLRenderer::Ptr renderer ) {
 
 int main( int argc, char* argv[] ) {
 
-  auto onQuit = defer( sdl::quit );
+  return RunExample( shader_fireball );
 
-  RendererParameters parameters;
-
-  if ( !sdl::init( parameters ) || !glew::init( parameters ) ) {
-    return 0;
-  }
-
-  auto renderer = GLRenderer::create( parameters );
-  if ( !renderer ) {
-    return 0;
-  }
-
-  shader_fireball( renderer );
-
-  return 0;
 }
