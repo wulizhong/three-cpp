@@ -13,7 +13,7 @@ public:
   Event( const EventType& typeIn, void* targetIn = nullptr )
   : type( std::move( typeIn ) ),
     target( targetIn ) {}
-    
+
   const EventType type;
 
   void* target;
