@@ -39,7 +39,7 @@ GLWindow::GLWindow( const RendererParameters& parameters )
     : window( nullptr ),
       context( nullptr ),
       renderStats( true ) {
-          
+
   if ( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_EVENTS ) < 0 ) {
     console().error() << "Unable to initialize SDL: " << SDL_GetError();
     return;
@@ -49,7 +49,7 @@ GLWindow::GLWindow( const RendererParameters& parameters )
   SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 1 );
   SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY );
   SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 24 );
-  
+
   if ( parameters.vsync )
     SDL_GL_SetSwapInterval( 1 );
 
@@ -149,14 +149,14 @@ bool GLWindow::processEvents() {
     }
 
     auto type = (unsigned int)event.type;
-      
+
     auto eventTypeListenersIt = listeners.find( type  );
     if ( eventTypeListenersIt == listeners.end() ) {
       continue;
     }
-      
+
     for ( const auto& listener : eventTypeListenersIt->second ) {
-      listener( event );
+      (*listener)( SdlEvent(event) );
     }
   }
   return true;

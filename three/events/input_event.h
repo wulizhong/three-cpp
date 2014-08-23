@@ -2,15 +2,15 @@
 #define THREE_EVENTS_INPUT_EVENT_H
 
 #include <three/common.h>
-#include <three/events/event.h>
+#include <three/events/core_event.h>
 
 namespace three {
 
-class InputEvent : public Event {
+class InputEvent : public CoreEvent {
 public:
 
   InputEvent( const EventType& type )
-    : Event( type ) {}
+    : CoreEvent( type ) {}
 
 };
 

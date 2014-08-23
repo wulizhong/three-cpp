@@ -8,60 +8,47 @@
 #include "three/renderers/gl_renderer.h"
 #include "three/scenes/fog_exp2.h"
 
+#include "three/extras/image_utils.h"
+
 using namespace three;
 using namespace three_examples;
 
-void particles_random( GLWindow& window, GLRenderer& renderer ) {
+void misc_sound( GLWindow& window, GLRenderer& renderer ) {
 
   auto camera = PerspectiveCamera::create(
-    75, ( float )renderer.width() / renderer.height(), 1.f, 3000
+    55, ( float )renderer.width() / renderer.height(), 2.f, 2000
   );
   camera->position().z = 1000;
 
   auto scene = Scene::create();
-  scene->fog = FogExp2::create( 0x000000, .0007f );
+  scene->fog = FogExp2::create( 0x000000, .001f );
 
   auto geometry = Geometry::create();
 
-  const auto particleCount = 20000;
+  const auto particleCount = 10000;
   geometry->vertices.reserve( particleCount );
-  std::generate_n( std::back_inserter( geometry->vertices ), particleCount,
+
+  std::generate_n( std::back_inserter( geometry->vertices ),
+                   particleCount,
                    [] { return Vector3( Math::random(-1000.f, 1000.f),
                                         Math::random(-1000.f, 1000.f),
                                         Math::random(-1000.f, 1000.f) ); } );
 
-  std::vector<Material::Ptr> materials;
-  auto addParticleSystem = [&]( const Vector3& color, float size ) {
+  auto sprite = ImageUtils::loadTexture(
+    threeDataPath("textures/sprites/disc.png")
+  );
 
-    //materials[i] = new THREE.ParticleBasicMaterial( { color: color, size: size } );
-    auto material = ParticleSystemMaterial::create(
-      Material::Parameters().add( "size", size )
-    );
+  auto material = ParticleSystemMaterial::create(
+    Material::Parameters().add( "size", 35.f )
+                          .add( "map", sprite )
+                          .add( "sizeAttenuation", false )
+                          .add( "transparent", true)
+  );
+  material->color.setHSL( 1.f, 0.3f, 0.7f );
 
-    materials.push_back( material );
-    material->color.setHSL( color[0], color[1], color[2] );
-
-    auto particles = ParticleSystem::create( geometry, material );
-
-    particles->rotation() = Euler( Math::random() * 6,
-                                   Math::random() * 6,
-                                   Math::random() * 6 );
-
-    scene->add( particles );
-  };
-
-  typedef std::pair<Vector3, float> ColorSize;
-  std::array<ColorSize, 5> params = {
-    ColorSize( Vector3(  1.f, 1.f, 0.5f), 5.f ),
-    ColorSize( Vector3(0.95f, 1.f, 0.5f), 4.f ),
-    ColorSize( Vector3(0.90f, 1.f, 0.5f), 3.f ),
-    ColorSize( Vector3(0.85f, 1.f, 0.5f), 2.f ),
-    ColorSize( Vector3(0.80f, 1.f, 0.5f), 1.f )
-  };
-
-  for ( const auto& param : params ) {
-    addParticleSystem( param.first, param.second );
-  }
+  auto particles = ParticleSystem::create( geometry, material );
+  particles->sortParticles = true;
+  scene->add( particles );
 
   /////////////////////////////////////////////////////////////////////////
 
@@ -92,18 +79,8 @@ void particles_random( GLWindow& window, GLRenderer& renderer ) {
     camera->position().y += (  1000.f * mouseY - camera->position().y ) * 3 * dt;
     camera->lookAt( scene->position() );
 
-    for ( size_t i = 0; i < scene->children.size(); ++i ) {
-      auto& object = *scene->children[ i ];
-      if ( object.type() == THREE::ParticleSystem ) {
-        object.rotation().y = time * ( i < 4 ? i + 1 : - ( (int)i + 1 ) );
-      }
-    }
-
-    for ( size_t i = 0; i < materials.size(); ++i ) {
-      auto& color = params[ i ].first;
-      const auto h = Math::fmod( 360.f * ( color[0] + time ), 360.f ) / 360.f;
-      materials[ i ]->color.setHSL( h, color[ 1 ], color[ 2 ] );
-    }
+    const auto h = Math::fmod( 360.f * ( 1.f + time ), 360.f ) / 360.f;
+    material->color.setHSL( h, 0.5f, 0.5f );
 
     renderer.render( *scene, *camera );
 
@@ -115,6 +92,9 @@ void particles_random( GLWindow& window, GLRenderer& renderer ) {
 
 int main( int argc, char* argv[] ) {
 
-  return RunExample( particles_random );
+  RendererParameters parameters;
+  parameters.clearAlpha = 1;
+
+  return RunExample( misc_sound, parameters );
 
 }

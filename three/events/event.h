@@ -10,13 +10,9 @@ namespace three {
 class Event {
 public:
 
-  Event( const EventType& typeIn, void* targetIn = nullptr )
-  : type( std::move( typeIn ) ),
-    target( targetIn ) {}
+  Event() {}
 
-  const EventType type;
-
-  void* target;
+  virtual ~Event() {};
 
 };
 

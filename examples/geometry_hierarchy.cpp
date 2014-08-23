@@ -56,16 +56,18 @@ void geometry_hierarchy( GLWindow& window, GLRenderer& renderer ) {
   /////////////////////////////////////////////////////////////////////////
 
   auto mouseX = 0.f, mouseY = 0.f;
-  window.addEventListener( SDL_MOUSEMOTION, [&]( const SDL_Event & event ) {
-    mouseX = 2.f * ( ( float )event.motion.x / renderer.width()  - 0.5f );
-    mouseY = 2.f * ( ( float )event.motion.y / renderer.height() - 0.5f );
+  window.addEventListener( SDL_MOUSEMOTION, [&]( const Event& event ) {
+    auto sdlEvent = static_cast<const SdlEvent&>( event );
+    mouseX = 2.f * ( ( float )sdlEvent.data.motion.x / renderer.width()  - 0.5f );
+    mouseY = 2.f * ( ( float )sdlEvent.data.motion.y / renderer.height() - 0.5f );
   } );
 
-  window.addEventListener( SDL_WINDOWEVENT, [&]( const SDL_Event& event ) {
-    if (event.window.event != SDL_WINDOWEVENT_RESIZED) return;
-    camera->aspect = ( float )event.window.data1 / event.window.data2;
+  window.addEventListener( SDL_WINDOWEVENT, [&]( const Event& event ) {
+    auto sdlEvent = static_cast<const SdlEvent&>( event );
+    if (sdlEvent.data.window.event != SDL_WINDOWEVENT_RESIZED) return;
+    camera->aspect = ( float )sdlEvent.data.window.data1 / sdlEvent.data.window.data2;
     camera->updateProjectionMatrix();
-    renderer.setSize( event.window.data1, event.window.data2 );
+    renderer.setSize( sdlEvent.data.window.data1, sdlEvent.data.window.data2 );
   } );
 
   /////////////////////////////////////////////////////////////////////////

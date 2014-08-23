@@ -30,11 +30,6 @@ Image createImage( int width = 256, int height = 256 ) {
 
 void test_memory( GLWindow& window, GLRenderer& renderer ) {
 
-  auto mouseX = 0.f, mouseY = 0.f;
-  window.addEventListener(SDL_MOUSEMOTION, [&]( const SDL_Event& event ) {
-    mouseX = 2.f * ((float)event.motion.x / renderer.width()  - 0.5f);
-    mouseY = 2.f * ((float)event.motion.y / renderer.height() - 0.5f);
-  });
 
   //////////////////////////////////////////////////////////////////////////
 
@@ -49,6 +44,25 @@ void test_memory( GLWindow& window, GLRenderer& renderer ) {
   auto pointLight = PointLight::create( 0xFFFFFF );
   pointLight->position() = Vector3( 10, 50, 130 );
   scene->add( pointLight );
+
+/////////////////////////////////////////////////////////////////////////
+
+  auto mouseX = 0.f, mouseY = 0.f;
+  window.addEventListener( SDL_MOUSEMOTION, [&]( const Event& event ) {
+    auto sdlEvent = static_cast<const SdlEvent&>( event );
+    mouseX = 2.f * ( ( float )sdlEvent.data.motion.x / renderer.width()  - 0.5f );
+    mouseY = 2.f * ( ( float )sdlEvent.data.motion.y / renderer.height() - 0.5f );
+  } );
+
+  window.addEventListener( SDL_WINDOWEVENT, [&]( const Event& event ) {
+    auto sdlEvent = static_cast<const SdlEvent&>( event );
+    if (sdlEvent.data.window.event != SDL_WINDOWEVENT_RESIZED) return;
+    camera->aspect = ( float )sdlEvent.data.window.data1 / sdlEvent.data.window.data2;
+    camera->updateProjectionMatrix();
+    renderer.setSize( sdlEvent.data.window.data1, sdlEvent.data.window.data2 );
+  } );
+
+  /////////////////////////////////////////////////////////////////////////
 
   window.animate ( [&]( float ) -> bool {
 

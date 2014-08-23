@@ -75,15 +75,16 @@ void lines_sphere( GLWindow& window, GLRenderer& renderer ) {
   addLine( originalScales[ 7 ], 0xffffff, 0.25f, 1 );
   addLine( originalScales[ 8 ], 0xffffff, 0.125f, 1 );
 
-  //////////////////////////////////////////////////////////////////////////
+ /////////////////////////////////////////////////////////////////////////
 
   auto mouseX = 0.f, mouseY = 0.f;
-  window.addEventListener(SDL_MOUSEMOTION, [&]( const SDL_Event& event ) {
-    mouseX = 2.f * ((float)event.motion.x / renderer.width()  - 0.5f);
-    mouseY = 2.f * ((float)event.motion.y / renderer.height() - 0.5f);
-  });
+  window.addEventListener( SDL_MOUSEMOTION, [&]( const Event& event ) {
+    auto sdlEvent = static_cast<const SdlEvent&>( event );
+    mouseX = 2.f * ( ( float )sdlEvent.data.motion.x / renderer.width()  - 0.5f );
+    mouseY = 2.f * ( ( float )sdlEvent.data.motion.y / renderer.height() - 0.5f );
+  } );
 
-  //////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////
 
   auto time = 0.f;
 

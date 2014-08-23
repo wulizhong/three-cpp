@@ -55,7 +55,7 @@ struct TextureDesc {
   float anisotropy;
 };
 
-class Texture : public TextureBuffer, public DefaultEventDispatcher {
+class Texture : public TextureBuffer, public CoreEventDispatcher {
 
 public:
 

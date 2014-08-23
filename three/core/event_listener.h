@@ -4,61 +4,36 @@
 #include <three/common.h>
 
 #include <three/events/event.h>
-
+#include <three/utils/noncopyable.h>
+#include <three/utils/memory.h>
 #include <functional>
 
 namespace three {
 
-template<typename TEvent>
-class EventListener {
+class EventListener : NonCopyable {
 public:
 
-  typedef std::function<void(const TEvent&)> EventListenerFunc;
+  typedef std::function<void(const Event&)> EventListenerFunc;
 
   virtual ~EventListener() {}
 
+  static std::shared_ptr<EventListener> create( const EventListenerFunc& funcIn ) {
+    return three::make_shared<EventListener>( std::move(funcIn) );
+  }
+
+  void operator()( const Event& event ) const { func(event); }
+
+protected:
+
   EventListener( const EventListenerFunc& funcIn )
-  : id( EventListenerCount()++ ),
-    func( std::move(funcIn) ) {}
-
-  EventListener( const EventListener& other )
-  : id( EventListenerCount()++ ),
-    func( std::move(other.func) ) {}
-
-  EventListener( EventListener&& other )
-  : id( other.id ),
-    func( std::forward<EventListenerFunc>(other.func) ) {}
-
-  EventListener& operator=( const EventListener& other ) {
-    id = EventListenerCount()++;
-    func = std::move(other.func);
-    return *this;
-  }
-
-  EventListener& operator=( EventListener&& other ) {
-    id = other.id;
-    func = std::forward<EventListenerFunc>(other.func);
-    return *this;
-  }
-
-  void operator()( const TEvent& event ) const { func(event); }
-
-  bool operator==( const EventListener& listener ) const { return id == listener.id; }
-  bool operator!=( const EventListener& listener ) const { return id != listener.id; }
+  : func( std::move(funcIn) ) {}
 
 private:
-  
-  static unsigned int& EventListenerCount() {
-    static unsigned int sEventListenerCount = 0;
-    return sEventListenerCount;
-  }
-    
-  unsigned int id;
 
   EventListenerFunc func;
 
 };
 
-} // end namespace three 
+} // end namespace three
 
 #endif // THREE_EVENT_LISTENER_H

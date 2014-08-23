@@ -4,7 +4,7 @@
 class FirstPersonControls {
 public:
 
-  static std::shared_ptr<FirstPersonControls> create( std::shared_ptr<Object3D> object, std::shared_ptr<GLWindow>& window ) {
+  static std::shared_ptr<FirstPersonControls> create( std::shared_ptr<Object3D> object, GLWindow& window ) {
     return three:make_shared<FirstPersonControls>( object, window );
   }
 
@@ -55,12 +55,12 @@ public:
 
   virtual ~FirstPersonControls() {
 
-    domElement.removeEventListener( 'mousemove', bind( this, onMouseMove ), false );
-    domElement.removeEventListener( 'mousedown', bind( this, onMouseDown ), false );
-    domElement.removeEventListener( 'mouseup', bind( this, onMouseUp ), false );
+    window.removeEventListener( MouseEvent::MOUSE_MOVE, bind( this, &FirstPersonControls::onMouseMove ) );
+    window.removeEventListener( MouseEvent::MOUSE_DOWN, bind( this, &FirstPersonControls::onMouseDown ) );
+    window.removeEventListener( MouseEvent::MOUSE_Up, bind( this, &FirstPersonControls::onMouseUp ) );
 
-    window.removeEventListener( 'keydown', bind( this, onKeyDown ), false );
-    window.removeEventListener( 'keyup', bind( this, onKeyUp ), false );
+    window.removeEventListener( KeyboardEvent::KEY_DOWN, bind( this, &FirstPersonControls::onKeyDown ) );
+    window.removeEventListener( KeyboardEvent::KEY_UP, bind( this, &FirstPersonControls::onKeyUp ) );
 
   }
 
@@ -267,12 +267,12 @@ protected:
       viewHalfX( 0 ),
       viewHalfY( 0 ) {
 
-        domElement.addEventListener( 'mousemove', bind( this, onMouseMove ), false );
-        domElement.addEventListener( 'mousedown', bind( this, onMouseDown ), false );
-        domElement.addEventListener( 'mouseup', bind( this, onMouseUp ), false );
+        window.addEventListener( MouseEvent::MOUSE_MOVE, bind( this, &FirstPersonControls::onMouseMove ) );
+        window.addEventListener( MouseEvent::MOUSE_DOWN, bind( this, &FirstPersonControls::onMouseDown ) );
+        window.addEventListener( MouseEvent::MOUSE_Up, bind( this, &FirstPersonControls::onMouseUp ) );
 
-        window.addEventListener( 'keydown', bind( this, onKeyDown ), false );
-        window.addEventListener( 'keyup', bind( this, onKeyUp ), false );
+        window.addEventListener( KeyboardEvent::KEY_DOWN, bind( this, &FirstPersonControls::onKeyDown ) );
+        window.addEventListener( KeyboardEvent::KEY_UP, bind( this, &FirstPersonControls::onKeyUp ) );
 
         this->handleResize();
 

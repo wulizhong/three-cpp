@@ -103,8 +103,8 @@ void Scene::__addObject( const Object3D::Ptr& object ) {
   object->visit( objectAdd );
 
 
-  dispatchEvent( Event("objectAdded", object.get()) );
-  object->dispatchEvent( Event("addedToScene", this) );
+  dispatchEvent( CoreEvent("objectAdded", object.get()) );
+  object->dispatchEvent( CoreEvent("addedToScene", this) );
 
   for ( auto& child : object->children ) {
     __addObject( child );

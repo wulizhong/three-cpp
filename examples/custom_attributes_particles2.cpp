@@ -110,11 +110,12 @@ void shader( GLWindow& window, GLRenderer& renderer ) {
 
   /////////////////////////////////////////////////////////////////////////
 
-  window.addEventListener( SDL_WINDOWEVENT, [&]( const SDL_Event& event ) {
-    if (event.window.event != SDL_WINDOWEVENT_RESIZED) return;
-    camera->aspect = ( float )event.window.data1 / event.window.data2;
+  window.addEventListener( SDL_WINDOWEVENT, [&]( const Event& event ) {
+    auto sdlEvent = static_cast<const SdlEvent&>( event );
+    if (sdlEvent.data.window.event != SDL_WINDOWEVENT_RESIZED) return;
+    camera->aspect = ( float )sdlEvent.data.window.data1 / sdlEvent.data.window.data2;
     camera->updateProjectionMatrix();
-    renderer.setSize( event.window.data1, event.window.data2 );
+    renderer.setSize( sdlEvent.data.window.data1, sdlEvent.data.window.data2 );
   } );
 
   /////////////////////////////////////////////////////////////////////////

@@ -28,7 +28,7 @@
 
 namespace three {
 
-class THREE_DECL Material : public NonCopyable, public DefaultEventDispatcher {
+class THREE_DECL Material : public NonCopyable, public CoreEventDispatcher {
 
 public:
 

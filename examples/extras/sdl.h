@@ -17,16 +17,23 @@
 namespace three_examples {
 
 using namespace three;
-    
-typedef SDL_Event                         SdlEvent;
-typedef SDL_EventType                     SdlEventType;
 
-typedef three::EventDispatcher<unsigned int, SdlEvent> SdlEventDispatcher;
-typedef three::EventListener<SdlEvent> SdlEventListener;
-    
+class SdlEvent : public Event {
+public:
+
+  SdlEvent(const SDL_Event& eventData)
+  : data( std::move(eventData) ) {}
+
+  SDL_Event data;
+};
+
+typedef SDL_EventType                     SdlEventType;
+typedef three::EventDispatcher<unsigned int> SdlEventDispatcher;
+typedef three::EventListener SdlEventListener;
+
 class GLWindow : public three::NonCopyable, public SdlEventDispatcher {
 public:
-  
+
 
   GLWindow( const three::RendererParameters& );
   ~GLWindow();
