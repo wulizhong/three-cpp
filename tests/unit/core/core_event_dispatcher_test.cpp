@@ -10,7 +10,7 @@ using namespace three;
 class TestEvent : public CoreEvent {
 public:
 
-    TestEvent( int valIn ) : CoreEvent("testEvent"), val(valIn) {
+    TestEvent( int valIn ) : CoreEvent(10000), val(valIn) {
 
     }
 
@@ -21,7 +21,7 @@ void onSomeGlobalEvent( const Event& ev) {
     LOG("onSomeGlobalEvent called with event of type", static_cast<const CoreEvent&>(ev).type);
 }
 
-class Button : public CoreEventDispatcher {
+class Button : public EventDispatcher {
 public:
 
   Button() {}
@@ -74,7 +74,7 @@ TEST(core_event_dispatcher_test, addEventListener) {
     }));
 
     a.addEventListener("click", EventListener::create( onSomeGlobalEvent ) );
-    auto listener = a.addEventListener("update", std::bind(&Button::onSomeEvent, a, std::placeholders::_1) );
+    auto listener = a.addEventListener(TargetEvent::TARGET_DISPOSE, std::bind(&Button::onSomeEvent, a, std::placeholders::_1) );
 
     EXPECT_TRUE(a.hasEventListener("click"));
     EXPECT_TRUE(a.hasEventListener("update"));

@@ -6,16 +6,17 @@
 #include <three/events/event.h>
 #include <three/events/mouse_event.h>
 #include <three/events/keyboard_event.h>
+#include <three/utils/noncopyable.h>
 
 using namespace three;
 using namespace three_examples;
 using namespace std::placeholders;
 
-class FirstPersonControls {
+class FirstPersonControls : NonCopyable {
 public:
 
-  static std::shared_ptr<FirstPersonControls> create( std::shared_ptr<Object3D> object, GLWindow& window ) {
-    return three::make_shared<FirstPersonControls>( object, window );
+  static std::shared_ptr<FirstPersonControls> create( const std::shared_ptr<Object3D>& object, GLWindow& window ) {
+    return std::shared_ptr<FirstPersonControls>( new FirstPersonControls(object, window) );
   }
 
   std::shared_ptr<Object3D> object;
@@ -60,6 +61,8 @@ public:
   bool moveUp;
   bool moveDown;
 
+  bool noFly;
+
   bool freeze;
 
   bool mouseDragOn;
@@ -91,8 +94,14 @@ public:
 
       switch ( mouseEvent.button ) {
 
-        case 0: moveForward = true; break;
-        case 2: moveBackward = true; break;
+        case MouseButton::NONE:
+        case MouseButton::MIDDLE:
+        case MouseButton::X1:
+        case MouseButton::X2:
+        default:
+          break;
+        case MouseButton::LEFT: moveForward = true; break;
+        case MouseButton::RIGHT: moveBackward = true; break;
 
       }
 
@@ -109,8 +118,15 @@ public:
 
       switch ( mouseEvent.button ) {
 
-        case 0: moveForward = false; break;
-        case 2: moveBackward = false; break;
+        case MouseButton::NONE:
+        case MouseButton::MIDDLE:
+        case MouseButton::X1:
+        case MouseButton::X2:
+        default:
+          break;
+        case MouseButton::LEFT: moveForward = false; break;
+        case MouseButton::RIGHT: moveBackward = false; break;
+
 
       }
 
@@ -257,7 +273,7 @@ public:
   };
 
 protected:
-  explicit FirstPersonControls( std::shared_ptr<Object3D> object, GLWindow& window )
+  explicit FirstPersonControls( const std::shared_ptr<Object3D>& object, GLWindow& window )
     : object( object ),
       window( window ),
       target( Vector3() ),
@@ -284,6 +300,7 @@ protected:
       moveBackward( false ),
       moveLeft( false ),
       moveRight( false ),
+      noFly( true ),
       freeze( false ),
       mouseDragOn( false ),
       viewHalfX( 0 ),
@@ -291,7 +308,7 @@ protected:
 
         window.addEventListener( MouseEvent::MOUSE_MOVE, std::bind( &FirstPersonControls::onMouseMove, this, _1 ) );
         window.addEventListener( MouseEvent::MOUSE_DOWN, std::bind( &FirstPersonControls::onMouseDown, this, _1 ) );
-        window.addEventListener( MouseEvent::MOUSE_Up, std::bind( &FirstPersonControls::onMouseUp, this, _1 ) );
+        window.addEventListener( MouseEvent::MOUSE_UP, std::bind( &FirstPersonControls::onMouseUp, this, _1 ) );
 
         window.addEventListener( KeyboardEvent::KEY_DOWN, std::bind( &FirstPersonControls::onKeyDown, this, _1 ) );
         window.addEventListener( KeyboardEvent::KEY_UP, std::bind( &FirstPersonControls::onKeyUp, this, _1 ) );
@@ -300,3 +317,5 @@ protected:
 
       }
 };
+
+#endif // THREE_EXAMPLES_CONTROLS_FIRST_PERSON_H

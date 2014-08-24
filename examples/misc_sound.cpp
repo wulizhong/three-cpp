@@ -6,6 +6,9 @@
 #include "three/extras/geometries/sphere_geometry.h"
 #include "examples/controls/first_person_controls.h"
 #include "three/renderers/renderer_parameters.h"
+#include "three/lights/directional_light.h"
+#include "three/materials/mesh_lambert_material.h"
+#include "three/objects/mesh.h"
 #include "three/renderers/gl_renderer.h"
 #include "three/scenes/fog_exp2.h"
 
@@ -21,7 +24,9 @@ void misc_sound( GLWindow& window, GLRenderer& renderer ) {
   );
   camera->position().set(0, 25, 0);
 
-  auto controls = FirstPersonControls( camera, window );
+  const auto& cameraObject = std::dynamic_pointer_cast<Object3D>(camera);
+
+  auto controls = FirstPersonControls::create( cameraObject, window );
   controls->movementSpeed = 70;
   controls->lookSpeed = 0.05;
   controls->noFly = true;
@@ -49,7 +54,7 @@ void misc_sound( GLWindow& window, GLRenderer& renderer ) {
 
   float s = 1;
 
-  auto mesh1 = Mesh::create( spehere, material_sphere1 );
+  auto mesh1 = Mesh::create( sphere, material_sphere1 );
   mesh1->scale().set( s, s, s);
   scene->add( mesh1 );
 
@@ -57,7 +62,7 @@ void misc_sound( GLWindow& window, GLRenderer& renderer ) {
   //       sound1.position.copy( mesh1.position );
   //       sound1.play();
 
-  auto mesh2 = Mesh::create( spehere, material_sphere2 );
+  auto mesh2 = Mesh::create( sphere, material_sphere2 );
   mesh2->position().set( 250, 30, 0);
   mesh2->scale().set( s, s, s);
   scene->add( mesh1 );
@@ -82,19 +87,25 @@ void misc_sound( GLWindow& window, GLRenderer& renderer ) {
   /////////////////////////////////////////////////////////////////////////
 
   auto mouseX = 0.f, mouseY = 0.f;
-  window.addEventListener( SDL_MOUSEMOTION, [&]( const Event& event ) {
-    auto sdlEvent = static_cast<const SdlEvent&>( event );
-    mouseX = 2.f * ( ( float )sdlEvent.data.motion.x / renderer.width()  - 0.5f );
-    mouseY = 2.f * ( ( float )sdlEvent.data.motion.y / renderer.height() - 0.5f );
-  } );
+  window.addEventListener( MouseEvent::MOUSE_MOVE, [&]( const Event& event ) {
 
-  window.addEventListener( SDL_WINDOWEVENT, [&]( const Event& event ) {
-    auto sdlEvent = static_cast<const SdlEvent&>( event );
-    if (sdlEvent.data.window.event != SDL_WINDOWEVENT_RESIZED) return;
-    camera->aspect = ( float )sdlEvent.data.window.data1 / sdlEvent.data.window.data2;
+    auto mouseEvent = static_cast<const MouseEvent&>( event );
+
+    mouseX = 2.f * ( mouseEvent.movementX / renderer.width()  - 0.5f );
+    mouseY = 2.f * ( mouseEvent.movementY / renderer.height() - 0.5f );
+
+  });
+
+  window.addEventListener( WindowEvent::WINDOW_RESIZED, [&]( const Event& event ) {
+
+    auto windowEvent = static_cast<const WindowEvent&>( event );
+
+    camera->aspect = (float)windowEvent.width / (float)windowEvent.height;
     camera->updateProjectionMatrix();
-    renderer.setSize( sdlEvent.data.window.data1, sdlEvent.data.window.data2 );
-  } );
+
+    renderer.setSize( windowEvent.width, windowEvent.height );
+
+  });
 
   /////////////////////////////////////////////////////////////////////////
 
@@ -106,8 +117,8 @@ void misc_sound( GLWindow& window, GLRenderer& renderer ) {
 
     controls->update( dt );
 
-    material_sphere1.color.setHSL( 0.0, 0.3 + 0.7 * (1 + Math::cos(time) ) / 2, 0.5 );
-    material_sphere2.color.setHSL( 0.0, 0.3 + 0.7 * (1 + Math::sin(time) ) / 2, 0.5 );
+    // material_sphere1->color.setHSL( 0.0, 0.3 + 0.7 * (1 + Math::cos(time) ) / 2, 0.5 );
+    // material_sphere2->color.setHSL( 0.0, 0.3 + 0.7 * (1 + Math::sin(time) ) / 2, 0.5 );
 
     renderer.render( *scene, *camera );
 

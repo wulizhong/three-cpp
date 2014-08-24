@@ -4,12 +4,14 @@
 #include "three/core/clock.h"
 #include "three/renderers/renderer_parameters.h"
 #include "three/renderers/gl_renderer.h"
+#include "three/events/events.h"
 
 #include "examples/extras/stats.h"
 
 // TODO(jdduke): Include gles where appropriate.
 #include <SDL2/SDL_assert.h>
 #include <SDL2/SDL_timer.h>
+#include <sstream>
 
 #define M_CONC(A, B) M_CONC_(A, B)
 #define M_CONC_(A, B) A##B
@@ -132,13 +134,19 @@ void GLWindow::swapBuffers() {
 }
 
 bool GLWindow::processEvents() {
-  SDL_Event event;
-  while ( SDL_PollEvent( &event ) ) {
-    if ( event.type == SDL_QUIT )
+
+  if(listeners.empty()) {
+    return true;
+  }
+
+  SDL_Event sdlEvent;
+
+  while ( SDL_PollEvent( &sdlEvent ) ) {
+    if ( sdlEvent.type == SDL_QUIT )
       return false;
 
-    if ( event.type == SDL_KEYDOWN ) {
-      switch ( event.key.keysym.sym ) {
+    if ( sdlEvent.type == SDL_KEYDOWN ) {
+      switch ( sdlEvent.key.keysym.sym ) {
         case SDLK_q:
         case SDLK_ESCAPE:
           return false;
@@ -148,19 +156,97 @@ bool GLWindow::processEvents() {
       };
     }
 
-    auto type = (unsigned int)event.type;
+    EventType type;
 
-    auto eventTypeListenersIt = listeners.find( type  );
+    switch(sdlEvent.type) {
+
+      case SDL_MOUSEMOTION:
+        type = MouseEvent::MOUSE_MOVE;
+        break;
+      case SDL_MOUSEBUTTONDOWN:
+        type = MouseEvent::MOUSE_DOWN;
+        break;
+
+      case SDL_MOUSEBUTTONUP:
+        type = MouseEvent::MOUSE_UP;
+        break;
+
+      case SDL_MOUSEWHEEL:
+        type = MouseEvent::MOUSE_WHEEL;
+        break;
+
+      case SDL_WINDOWEVENT:
+
+        switch (sdlEvent.window.event) {
+        case SDL_WINDOWEVENT_ENTER:
+            type = WindowEvent::WINDOW_ENTER;
+            break;
+        case SDL_WINDOWEVENT_LEAVE:
+            type = WindowEvent::WINDOW_LEAVE;
+            break;
+        case SDL_WINDOWEVENT_FOCUS_GAINED:
+            type = WindowEvent::WINDOW_FOCUS_GAINED;
+            break;
+        case SDL_WINDOWEVENT_FOCUS_LOST:
+            type = WindowEvent::WINDOW_FOCUS_LOST;
+            break;
+        case SDL_WINDOWEVENT_SHOWN:
+            type = WindowEvent::WINDOW_SHOWN;
+            break;
+        case SDL_WINDOWEVENT_HIDDEN:
+            type = WindowEvent::WINDOW_HIDDEN;
+            break;
+        case SDL_WINDOWEVENT_EXPOSED:
+            type = WindowEvent::WINDOW_EXPOSED;
+            break;
+        case SDL_WINDOWEVENT_MOVED:
+            type = WindowEvent::WINDOW_MOVED;
+            break;
+        case SDL_WINDOWEVENT_RESIZED:
+            type = WindowEvent::WINDOW_RESIZED;
+            break;
+        case SDL_WINDOWEVENT_MINIMIZED:
+            type = WindowEvent::WINDOW_MINIMIZED;
+            break;
+        case SDL_WINDOWEVENT_MAXIMIZED:
+            type = WindowEvent::WINDOW_MAXIMIZED;
+            break;
+        case SDL_WINDOWEVENT_RESTORED:
+            type = WindowEvent::WINDOW_RESTORED;
+            break;
+        case SDL_WINDOWEVENT_CLOSE:
+            type = WindowEvent::WINDOW_CLOSE;
+            break;
+        default:
+            continue;
+        }
+
+        // construct window event
+
+        break;
+
+      default:
+        continue;
+    }
+
+    auto eventTypeListenersIt = listeners.find( type );
     if ( eventTypeListenersIt == listeners.end() ) {
       continue;
     }
 
+    Event event = mapEvent(sdlEvent, type);
+
     for ( const auto& listener : eventTypeListenersIt->second ) {
-      (*listener)( SdlEvent(event) );
+      (*listener)( SdlEvent(sdlEvent) );
     }
   }
   return true;
 }
+
+Event GLWindow::mapEvent( const SDL_Event& sdlEvent, const EventType type) {
+  return Event();
+}
+
 
 } // namespace three_examples
 

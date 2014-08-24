@@ -72,6 +72,8 @@ class CoreEvent;
 class MouseEvent;
 class KeyboardEvent;
 class InputEvent;
+class UiEvent;
+class WindowEvent;
 
 template < typename Key, typename Value >
 class Properties;

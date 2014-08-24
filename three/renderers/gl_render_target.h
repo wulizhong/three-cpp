@@ -40,7 +40,7 @@ struct TargetDesc {
   bool stencilBuffer;
 };
 
-class GLRenderTarget : public GLRenderTargetBuffer, public CoreEventDispatcher {
+class GLRenderTarget : public GLRenderTargetBuffer, public EventDispatcher {
 public:
 
   typedef std::shared_ptr<GLRenderTarget> Ptr;

@@ -2,6 +2,7 @@
 #define THREE_EVENTS_CORE_EVENT_H
 
 #include <three/common.h>
+#include <three/events/event.h>
 #include <string>
 
 namespace three {
@@ -9,15 +10,12 @@ namespace three {
 class CoreEvent : public Event {
 public:
 
-  CoreEvent( const std::string& typeIn, void* targetIn = nullptr )
-  : type( std::move( typeIn ) ),
-    target( targetIn ) {}
+  CoreEvent( const EventType type )
+  : type( type ) {}
 
   virtual ~CoreEvent() {}
 
-  const std::string type;
-
-  void* target;
+  const EventType type;
 
 };
 

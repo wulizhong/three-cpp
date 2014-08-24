@@ -28,12 +28,9 @@ public:
 };
 
 typedef SDL_EventType                     SdlEventType;
-typedef three::EventDispatcher<unsigned int> SdlEventDispatcher;
-typedef three::EventListener SdlEventListener;
 
-class GLWindow : public three::NonCopyable, public SdlEventDispatcher {
+class GLWindow : public three::NonCopyable, public EventDispatcher {
 public:
-
 
   GLWindow( const three::RendererParameters& );
   ~GLWindow();
@@ -48,6 +45,7 @@ public:
 private:
   void swapBuffers();
   bool processEvents();
+  Event mapEvent(const SDL_Event& sdlEvent, const EventType type);
 
   SDL_Window* window;
   SDL_GLContext context;

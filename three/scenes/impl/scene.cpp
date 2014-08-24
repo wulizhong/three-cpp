@@ -8,6 +8,7 @@
 #include <three/lights/light.h>
 #include <three/lights/directional_light.h>
 #include <three/utils/template.h>
+#include <three/events/events.h>
 
 
 namespace three {
@@ -103,8 +104,8 @@ void Scene::__addObject( const Object3D::Ptr& object ) {
   object->visit( objectAdd );
 
 
-  dispatchEvent( CoreEvent("objectAdded", object.get()) );
-  object->dispatchEvent( CoreEvent("addedToScene", this) );
+  dispatchEvent( TargetEvent(TargetEvent::TARGET_ADDED, object.get()) );
+  object->dispatchEvent( TargetEvent(TargetEvent::TARGET_ADDED_TO_SCENE, this) );
 
   for ( auto& child : object->children ) {
     __addObject( child );

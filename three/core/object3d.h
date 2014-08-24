@@ -28,7 +28,7 @@
 
 namespace three {
 
-class THREE_DECL Object3D : public CoreEventDispatcher, NonCopyable {
+class THREE_DECL Object3D : public EventDispatcher, NonCopyable {
 public:
 
   typedef std::shared_ptr<Object3D> Ptr;

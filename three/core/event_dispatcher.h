@@ -3,8 +3,7 @@
 
 #include <three/common.h>
 #include <three/core/event_listener.h>
-#include <three/events/event.h>
-#include <three/events/core_event.h>
+#include <three/events/events.h>
 
 #include <unordered_map>
 #include <vector>
@@ -15,13 +14,12 @@
 
 namespace three {
 
-template<typename TKey>
 class EventDispatcher {
 public:
 
   virtual ~EventDispatcher() {}
 
-  std::shared_ptr<EventListener> addEventListener( const TKey& type, const std::function<void(const Event&)>& func ) {
+  std::shared_ptr<EventListener> addEventListener( const EventType type, const std::function<void(const Event&)>& func ) {
 
     auto listener = EventListener::create( func );
 
@@ -30,17 +28,17 @@ public:
     return listener;
   }
 
-  void addEventListener( const TKey& type, const std::shared_ptr<EventListener>& listener ) {
+  void addEventListener( const EventType type, const std::shared_ptr<EventListener>& listener ) {
     if(!hasEventListener(type, listener)) {
       listeners[ type ].emplace_back( listener );
     }
   }
 
-  bool hasEventListener( const TKey& type ) const {
+  bool hasEventListener( const EventType type ) const {
     return listeners.find( type ) != listeners.cend() ;
   }
 
-  bool hasEventListener( const TKey& type, const std::shared_ptr<EventListener>& listener ) const {
+  bool hasEventListener( const EventType type, const std::shared_ptr<EventListener>& listener ) const {
 
     auto typeListeners = listeners.find( type );
     if( typeListeners  == listeners.end() ) {
@@ -55,7 +53,7 @@ public:
     listeners.clear();
   }
 
-  void removeEventListener( const TKey& type ) {
+  void removeEventListener( const EventType type ) {
     auto it = listeners.find( type );
 
     if(it != listeners.end()) {
@@ -65,7 +63,7 @@ public:
 
   }
 
-  void removeEventListener( const TKey& type, const std::shared_ptr<EventListener>& listener ) {
+  void removeEventListener( const EventType type, const std::shared_ptr<EventListener>& listener ) {
 
     auto& typeListeners = listeners[ type ];
     auto it = std::find(typeListeners.cbegin(), typeListeners.cend(), listener);
@@ -82,7 +80,7 @@ public:
 
   }
 
-  void dispatchEvent( const TKey& type, const Event& event ) {
+  void dispatchEvent( const EventType type, const Event& event ) {
 
     auto typeListeners = listeners.find( type );
 
@@ -114,18 +112,16 @@ public:
 
   }
 
-  void dispatchEvent( const TKey& eventName ) {
-    auto ev = CoreEvent( eventName );
+  void dispatchEvent( const EventType type ) {
+    auto ev = CoreEvent( type );
     dispatchEvent( ev );
   }
 
 protected:
   typedef std::vector<std::shared_ptr<EventListener>> EventListeners;
-  std::unordered_map<TKey, EventListeners> listeners;
+  std::unordered_map<EventType, EventListeners> listeners;
 
 };
-
-typedef EventDispatcher<std::string> CoreEventDispatcher;
 
 } // namespace three
 

@@ -168,13 +168,16 @@ void custom_attributes_particles3( GLWindow& window, GLRenderer& renderer ) {
 
   /////////////////////////////////////////////////////////////////////////
 
-  window.addEventListener( SDL_WINDOWEVENT, [&]( const Event& event ) {
-    auto sdlEvent = static_cast<const SdlEvent&>( event );
-    if (sdlEvent.data.window.event != SDL_WINDOWEVENT_RESIZED) return;
-    camera->aspect = ( float )sdlEvent.data.window.data1 / sdlEvent.data.window.data2;
+  window.addEventListener( WindowEvent::WINDOW_RESIZED, [&]( const Event& event ) {
+
+    auto windowEvent = static_cast<const WindowEvent&>( event );
+
+    camera->aspect = (float)windowEvent.width / (float)windowEvent.height;
     camera->updateProjectionMatrix();
-    renderer.setSize( sdlEvent.data.window.data1, sdlEvent.data.window.data2 );
-  } );
+
+    renderer.setSize( windowEvent.width, windowEvent.height );
+
+  });
 
   /////////////////////////////////////////////////////////////////////////
 

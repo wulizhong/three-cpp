@@ -55,7 +55,7 @@ struct TextureDesc {
   float anisotropy;
 };
 
-class Texture : public TextureBuffer, public CoreEventDispatcher {
+class Texture : public TextureBuffer, public EventDispatcher {
 
 public:
 
@@ -122,13 +122,13 @@ public:
 
   inline void update()  {
 
-     dispatchEvent( "update" );
+     dispatchEvent( TargetEvent::TARGET_UPDATE );
 
   }
 
   inline void dispose() {
 
-    dispatchEvent( "dispose" );
+    dispatchEvent( TargetEvent::TARGET_DISPOSE );
 
   }
 
