@@ -2,28 +2,18 @@ three.cpp
 =========
 
 ### Status
-[![Build Status](https://travis-ci.org/jdduke/three_cpp.svg?branch=dev_r65)](https://travis-ci.org/jdduke/three_cpp?branch=dev_r65)
+[![Build Status](https://travis-ci.org/elwinarens/three_cpp.svg)](https://travis-ci.org/elwinarens/three_cpp)
 
 #### A port of three.js to C++ #####
 
-[three.js](http://mrdoob.github.com/three.js/) is a popular and
-accessible 3D library (credits to mdroob and alteredq). The goal with three.cpp
-is to fully implement the relevant portions of the library in C++11, up
-to and including revision 65.
-
-Before you start raging, see the [FAQ](#faq).
-
-Note: As of Nov 17, 2013, this project has been seriously neglected for the better part of a year.  
-If there is demand, I (jdduke) would be happy to dust it off, clean up the code and get it back on track.
-Feel free to message me privately if you have specific requests and/or ideas.
-
+[three.js](http://mrdoob.github.com/three.js/) is a popular and accessible 3D library (credits to the three.js authors for the original library and to jdduke for the initial port to C++). The goal with three.cpp is to fully implement the relevant portions of the library in C++11, up to and including revision 65.
 
 ## Usage ##
 
 three.cpp can be compile into a static or dynamic library.
 
 ### Setup ###
-* `git clone git://github.com/jdduke/three_cpp`
+* `git clone git://github.com/elwinarens/three_cpp`
 * `cd three_cpp`
 * `mkdir build`
 * `cd build`
@@ -129,27 +119,18 @@ TODO: Test with GLES (Android/iOS/NACL)
 
 ## Supported Platforms ##
 
-You'll need a sufficiently modern C++11 compiler:
-* >= Clang 3.1
-* >= GCC 4.6.3
-* MSVC 2012 (Update 4 w/ Nov 2012 CTP)
+You'll need a modern C++11 compiler:
+* >= Clang 3.4
+* >= GCC 4.8
+* MSVC 2013
 
 Implemented functionality tested via examples, and working on:
 * Mint 13 with GCC 4.6.3
-* Win 7 with both MSVC 2012 and MinGW (GCC 4.8 and 4.7)
+* Win 7 with both MSVC 2013 and MinGW (GCC 4.8 and 4.7)
 * OSX with GCC 4.7.2 and Clang 3.1
 
-Some examples might be a little flaky on any given platform.
-* MSVC 2012: This has been just a pain to support (no variadics, no initializer lists, no default/deleted functions, no constexpr etc...), and support may be dropped at some point in the future. Update: With the November 2012 CTP, things have improved a great deal;
-* OSX: VSync is on for all samples, I haven't bothered to take a closer look.
 
+## Troubleshooting ##
 
-## FAQ ##
-
-* Why on earth would you do this?
-    * It started as an exercise to 1) dive into a popular Javascript library of
-     medium size, 2) play with C++11 and 3) offend as many programmers as possible.
-* But, but, C++ is so... its very existence troubles my spirit... why not target awesome language X?! Why, why C++?
-    * For the kids.
 * Why is it complaining about SDL on 64-bit Win builds?
     * CMake is likely pulling in 32-bit libraries. You can manually change the *${SDL_LIBRARY}* and *${SDLMAIN_LIBRARY}* CMake variables to refer to the proper libraries; simply change the **lib** directory reference to **lib64** if using the provided SDL implementation in **externals**.
