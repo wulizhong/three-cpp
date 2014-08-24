@@ -3,8 +3,6 @@
 
 #include <three/common.h>
 
-#include <three/constants.h>
-
 namespace three {
 
 class Event {

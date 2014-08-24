@@ -66,6 +66,13 @@ class Uniform;
 
 class GLRenderer;
 
+// Events
+class Event;
+class CoreEvent;
+class MouseEvent;
+class KeyboardEvent;
+class InputEvent;
+
 template < typename Key, typename Value >
 class Properties;
 

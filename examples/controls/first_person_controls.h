@@ -1,15 +1,27 @@
 #ifndef THREE_EXAMPLES_CONTROLS_FIRST_PERSON_H
 #define THREE_EXAMPLES_CONTROLS_FIRST_PERSON_H
 
+#include <three/common.h>
+#include <three/core/object3d.h>
+#include <three/events/event.h>
+#include <three/events/mouse_event.h>
+#include <three/events/keyboard_event.h>
+
+using namespace three;
+using namespace three_examples;
+using namespace std::placeholders;
+
 class FirstPersonControls {
 public:
 
   static std::shared_ptr<FirstPersonControls> create( std::shared_ptr<Object3D> object, GLWindow& window ) {
-    return three:make_shared<FirstPersonControls>( object, window );
+    return three::make_shared<FirstPersonControls>( object, window );
   }
 
   std::shared_ptr<Object3D> object;
-  std::shared_ptr<GLWindow> window;
+  GLWindow& window;
+
+  std::array<std::shared_ptr<EventListener>, 5> listeners;
 
   Vector3 target;
 
@@ -45,6 +57,8 @@ public:
   bool moveBackward;
   bool moveLeft;
   bool moveRight;
+  bool moveUp;
+  bool moveDown;
 
   bool freeze;
 
@@ -55,25 +69,27 @@ public:
 
   virtual ~FirstPersonControls() {
 
-    window.removeEventListener( MouseEvent::MOUSE_MOVE, bind( this, &FirstPersonControls::onMouseMove ) );
-    window.removeEventListener( MouseEvent::MOUSE_DOWN, bind( this, &FirstPersonControls::onMouseDown ) );
-    window.removeEventListener( MouseEvent::MOUSE_Up, bind( this, &FirstPersonControls::onMouseUp ) );
+    // window->removeEventListener( MouseEvent::MOUSE_MOVE, bind( this, &FirstPersonControls::onMouseMove ) );
+    // window->removeEventListener( MouseEvent::MOUSE_DOWN, bind( this, &FirstPersonControls::onMouseDown ) );
+    // window->removeEventListener( MouseEvent::MOUSE_Up, bind( this, &FirstPersonControls::onMouseUp ) );
 
-    window.removeEventListener( KeyboardEvent::KEY_DOWN, bind( this, &FirstPersonControls::onKeyDown ) );
-    window.removeEventListener( KeyboardEvent::KEY_UP, bind( this, &FirstPersonControls::onKeyUp ) );
+    // window->removeEventListener( KeyboardEvent::KEY_DOWN, bind( this, &FirstPersonControls::onKeyDown ) );
+    // window->removeEventListener( KeyboardEvent::KEY_UP, bind( this, &FirstPersonControls::onKeyUp ) );
 
   }
 
   void handleResize() {
-      viewHalfX = window.width() / 2.f;
-      viewHalfY = window.height() / 2.f;
+      // viewHalfX = window->width() / 2.f;
+      // viewHalfY = window->height() / 2.f;
   }
 
-  void onMouseDown( const MouseEvent& event ) {
+  void onMouseDown( const Event& event ) {
+
+    auto mouseEvent = static_cast<const MouseEvent&>( event );
 
     if ( activeLook ) {
 
-      switch ( event.button ) {
+      switch ( mouseEvent.button ) {
 
         case 0: moveForward = true; break;
         case 2: moveBackward = true; break;
@@ -85,11 +101,13 @@ public:
     mouseDragOn = true;
   }
 
-  void onMouseUp( const MouseEvent& event ) {
+  void onMouseUp( const Event& event ) {
+
+    auto mouseEvent = static_cast<const MouseEvent&>( event );
 
     if ( activeLook ) {
 
-      switch ( event.button ) {
+      switch ( mouseEvent.button ) {
 
         case 0: moveForward = false; break;
         case 2: moveBackward = false; break;
@@ -102,18 +120,22 @@ public:
 
   }
 
-  void onMouseMove( const MouseEvent& event ) {
+  void onMouseMove( const Event& event ) {
 
-      mouseX = event.pageX - viewHalfX;
-      mouseY = event.pageY - viewHalfY;
+    auto mouseEvent = static_cast<const MouseEvent&>( event );
+
+    mouseX = mouseEvent.screenX - viewHalfX;
+    mouseY = mouseEvent.screenY - viewHalfY;
 
   }
 
-  void onKeyDown( const KeyboardEvent& event ) {
+  void onKeyDown( const Event& event ) {
+
+    auto keyboardEvent = static_cast<const KeyboardEvent&>( event );
 
     //event.preventDefault();
 
-    switch ( event.keyCode ) {
+    switch ( keyboardEvent.key ) {
 
       case 38: /*up*/
       case 87: /*W*/ moveForward = true; break;
@@ -136,9 +158,11 @@ public:
 
   };
 
-  void onKeyUp( const KeyboardEvent& event ) {
+  void onKeyUp( const Event& event ) {
 
-    switch( event.keyCode ) {
+    auto keyboardEvent = static_cast<const KeyboardEvent&>( event );
+
+    switch( keyboardEvent.key ) {
 
       case 38: /*up*/
       case 87: /*W*/ moveForward = false; break;
@@ -169,7 +193,7 @@ public:
 
     if ( heightSpeed ) {
 
-      float y = Math::clamp( object.position.y, heightMin, heightMax );
+      float y = Math::clamp( object->position().y, heightMin, heightMax );
       float heightDelta = y - heightMin;
 
       autoSpeedFactor = delta * ( heightDelta * heightCoef );
@@ -182,14 +206,14 @@ public:
 
     float actualMoveSpeed = delta * movementSpeed;
 
-    if ( moveForward || ( autoForward && !moveBackward ) ) object.translateZ( - ( actualMoveSpeed + autoSpeedFactor ) );
-    if ( moveBackward ) object.translateZ( actualMoveSpeed );
+    if ( moveForward || ( autoForward && !moveBackward ) ) object->translateZ( - ( actualMoveSpeed + autoSpeedFactor ) );
+    if ( moveBackward ) object->translateZ( actualMoveSpeed );
 
-    if ( moveLeft ) object.translateX( - actualMoveSpeed );
-    if ( moveRight ) object.translateX( actualMoveSpeed );
+    if ( moveLeft ) object->translateX( - actualMoveSpeed );
+    if ( moveRight ) object->translateX( actualMoveSpeed );
 
-    if ( moveUp ) object.translateY( actualMoveSpeed );
-    if ( moveDown ) object.translateY( - actualMoveSpeed );
+    if ( moveUp ) object->translateY( actualMoveSpeed );
+    if ( moveDown ) object->translateY( - actualMoveSpeed );
 
     float actualLookSpeed = delta * lookSpeed;
 
@@ -210,32 +234,30 @@ public:
     lon += mouseX * actualLookSpeed;
     if( lookVertical ) lat -= mouseY * actualLookSpeed * verticalLookRatio;
 
-    lat = Math::max( - 85, Math::min( 85, lat ) );
-    phi = Math::degToRad( 90 - lat );
+    lat = Math::max( - 85.f, Math::min( 85.f, lat ) );
+    phi = Math::degToRad( 90.f - lat );
 
     theta = Math::degToRad( lon );
 
     if ( constrainVertical ) {
 
-      phi = Math::mapLinear( phi, 0, Math::PI(), verticalMin, verticalMax );
+      phi = Math::mapLinear( phi, 0.f, Math::PI(), verticalMin, verticalMax );
 
     }
 
-    var targetPosition = target,
-      position = object.position;
+    auto targetPosition = target;
+    const auto& position = object->position();
 
     targetPosition.x = position.x + 100 * Math::sin( phi ) * Math::cos( theta );
     targetPosition.y = position.y + 100 * Math::cos( phi );
     targetPosition.z = position.z + 100 * Math::sin( phi ) * Math::sin( theta );
 
-    object.lookAt( targetPosition );
+    object->lookAt( targetPosition );
 
   };
 
-  handleResize();
-
 protected:
-  explicit FirstPersonControls( std::shared_ptr<Object3D> object , GLWindow& window )
+  explicit FirstPersonControls( std::shared_ptr<Object3D> object, GLWindow& window )
     : object( object ),
       window( window ),
       target( Vector3() ),
@@ -267,12 +289,12 @@ protected:
       viewHalfX( 0 ),
       viewHalfY( 0 ) {
 
-        window.addEventListener( MouseEvent::MOUSE_MOVE, bind( this, &FirstPersonControls::onMouseMove ) );
-        window.addEventListener( MouseEvent::MOUSE_DOWN, bind( this, &FirstPersonControls::onMouseDown ) );
-        window.addEventListener( MouseEvent::MOUSE_Up, bind( this, &FirstPersonControls::onMouseUp ) );
+        window.addEventListener( MouseEvent::MOUSE_MOVE, std::bind( &FirstPersonControls::onMouseMove, this, _1 ) );
+        window.addEventListener( MouseEvent::MOUSE_DOWN, std::bind( &FirstPersonControls::onMouseDown, this, _1 ) );
+        window.addEventListener( MouseEvent::MOUSE_Up, std::bind( &FirstPersonControls::onMouseUp, this, _1 ) );
 
-        window.addEventListener( KeyboardEvent::KEY_DOWN, bind( this, &FirstPersonControls::onKeyDown ) );
-        window.addEventListener( KeyboardEvent::KEY_UP, bind( this, &FirstPersonControls::onKeyUp ) );
+        window.addEventListener( KeyboardEvent::KEY_DOWN, std::bind( &FirstPersonControls::onKeyDown, this, _1 ) );
+        window.addEventListener( KeyboardEvent::KEY_UP, std::bind( &FirstPersonControls::onKeyUp, this, _1 ) );
 
         this->handleResize();
 

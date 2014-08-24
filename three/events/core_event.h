@@ -2,8 +2,7 @@
 #define THREE_EVENTS_CORE_EVENT_H
 
 #include <three/common.h>
-
-#include <three/constants.h>
+#include <string>
 
 namespace three {
 

@@ -2,8 +2,9 @@
 
 #include "three/cameras/perspective_camera.h"
 #include "three/core/geometry.h"
-#include "three/materials/particle_system_material.h"
-#include "three/objects/particle_system.h"
+#include "three/extras/geometries/plane_geometry.h"
+#include "three/extras/geometries/sphere_geometry.h"
+#include "examples/controls/first_person_controls.h"
 #include "three/renderers/renderer_parameters.h"
 #include "three/renderers/gl_renderer.h"
 #include "three/scenes/fog_exp2.h"
@@ -16,39 +17,67 @@ using namespace three_examples;
 void misc_sound( GLWindow& window, GLRenderer& renderer ) {
 
   auto camera = PerspectiveCamera::create(
-    55, ( float )renderer.width() / renderer.height(), 2.f, 2000
+    50, ( float )renderer.width() / renderer.height(), 2.f, 2000
   );
-  camera->position().z = 1000;
+  camera->position().set(0, 25, 0);
+
+  auto controls = FirstPersonControls( camera, window );
+  controls->movementSpeed = 70;
+  controls->lookSpeed = 0.05;
+  controls->noFly = true;
+  controls->lookVertical = false;
 
   auto scene = Scene::create();
   scene->fog = FogExp2::create( 0x000000, .001f );
 
-  auto geometry = Geometry::create();
 
-  const auto particleCount = 10000;
-  geometry->vertices.reserve( particleCount );
+  auto light = DirectionalLight::create( 0xfffff );
+  light->position().set( 0, 0.5, 1).normalize();
+  scene->add( light );
 
-  std::generate_n( std::back_inserter( geometry->vertices ),
-                   particleCount,
-                   [] { return Vector3( Math::random(-1000.f, 1000.f),
-                                        Math::random(-1000.f, 1000.f),
-                                        Math::random(-1000.f, 1000.f) ); } );
+  auto sphere = SphereGeometry::create( 20, 32, 16 );
 
-  auto sprite = ImageUtils::loadTexture(
-    threeDataPath("textures/sprites/disc.png")
+  auto material_sphere1 = MeshLambertMaterial::create(
+    Material::Parameters().add( "shading", THREE::FlatShading )
+                          .add( "color", 0xffaa00 )
   );
 
-  auto material = ParticleSystemMaterial::create(
-    Material::Parameters().add( "size", 35.f )
-                          .add( "map", sprite )
-                          .add( "sizeAttenuation", false )
-                          .add( "transparent", true)
+  auto material_sphere2 = MeshLambertMaterial::create(
+    Material::Parameters().add( "shading", THREE::FlatShading )
+                          .add( "color", 0xff2200 )
   );
-  material->color.setHSL( 1.f, 0.3f, 0.7f );
 
-  auto particles = ParticleSystem::create( geometry, material );
-  particles->sortParticles = true;
-  scene->add( particles );
+  float s = 1;
+
+  auto mesh1 = Mesh::create( spehere, material_sphere1 );
+  mesh1->scale().set( s, s, s);
+  scene->add( mesh1 );
+
+  // sound1 = new Sound( [ 'sounds/358232_j_s_song.mp3', 'sounds/358232_j_s_song.ogg' ], 275, 1 );
+  //       sound1.position.copy( mesh1.position );
+  //       sound1.play();
+
+  auto mesh2 = Mesh::create( spehere, material_sphere2 );
+  mesh2->position().set( 250, 30, 0);
+  mesh2->scale().set( s, s, s);
+  scene->add( mesh1 );
+
+  // sound2 = new Sound( [ 'sounds/376737_Skullbeatz___Bad_Cat_Maste.mp3', 'sounds/376737_Skullbeatz___Bad_Cat_Maste.ogg' ], 275, 1 );
+  //       sound2.position.copy( mesh2.position );
+  //       sound2.play();
+
+  // ground
+  auto material = MeshLambertMaterial::create(
+    Material::Parameters()
+            .add("color", 0x7f7566)
+            .add("wireframe", true)
+            .add("wireframeLinewidth", 1)
+  );
+
+  auto mesh = Mesh::create( PlaneGeometry::create(1000,1000,100,100), material);
+  mesh->position().x = 0.1;
+  mesh->rotation().x = - Math::PI() / 2;
+  scene->add( mesh );
 
   /////////////////////////////////////////////////////////////////////////
 
@@ -75,12 +104,10 @@ void misc_sound( GLWindow& window, GLRenderer& renderer ) {
 
     time += dt * .05f;
 
-    camera->position().x += ( -1000.f * mouseX - camera->position().x ) * 3 * dt;
-    camera->position().y += (  1000.f * mouseY - camera->position().y ) * 3 * dt;
-    camera->lookAt( scene->position() );
+    controls->update( dt );
 
-    const auto h = Math::fmod( 360.f * ( 1.f + time ), 360.f ) / 360.f;
-    material->color.setHSL( h, 0.5f, 0.5f );
+    material_sphere1.color.setHSL( 0.0, 0.3 + 0.7 * (1 + Math::cos(time) ) / 2, 0.5 );
+    material_sphere2.color.setHSL( 0.0, 0.3 + 0.7 * (1 + Math::sin(time) ) / 2, 0.5 );
 
     renderer.render( *scene, *camera );
 

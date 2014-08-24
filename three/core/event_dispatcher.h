@@ -120,8 +120,8 @@ public:
   }
 
 protected:
-
-  std::unordered_map<TKey, std::vector<std::shared_ptr<EventListener>>> listeners;
+  typedef std::vector<std::shared_ptr<EventListener>> EventListeners;
+  std::unordered_map<TKey, EventListeners> listeners;
 
 };
 
