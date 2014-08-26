@@ -13,8 +13,7 @@
 #include "examples/extras/sdl.h"
 #include "examples/extras/stats.h"
 
-#include "three/events/window_event.h"
-#include "three/events/mouse_event.h"
+#include "three/events/events.h"
 
 namespace three_examples {
 
