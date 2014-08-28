@@ -122,15 +122,30 @@ void lines_cubes( GLWindow& window, GLRenderer& renderer ) {
   addLine( Vector3(d*2,-d,0),  scale, geometry,  m1);
   addLine( Vector3(-d*2,-d,0), scale, geometry,  m1);
 
-  //////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////
 
   auto mouseX = 0.f, mouseY = 0.f;
-  window.addEventListener(SDL_MOUSEMOTION, [&]( const SDL_Event& event ) {
-    mouseX = 2.f * ((float)event.motion.x / renderer.width()  - 0.5f);
-    mouseY = 2.f * ((float)event.motion.y / renderer.height() - 0.5f);
+  window.addEventListener( MouseEvent::MOUSE_MOVE, [&]( const Event& event ) {
+
+    auto mouseEvent = static_cast<const MouseEvent&>( event );
+
+    mouseX = 2.f * ( mouseEvent.screenX / renderer.width()  - 0.5f );
+    mouseY = 2.f * ( mouseEvent.screenY / renderer.height() - 0.5f );
+
   });
 
-  //////////////////////////////////////////////////////////////////////////
+  window.addEventListener( WindowEvent::WINDOW_RESIZED, [&]( const Event& event ) {
+
+    auto windowEvent = static_cast<const WindowEvent&>( event );
+
+    camera->aspect = (float)windowEvent.width / (float)windowEvent.height;
+    camera->updateProjectionMatrix();
+
+    renderer.setSize( windowEvent.width, windowEvent.height );
+
+  });
+
+  /////////////////////////////////////////////////////////////////////////
 
   auto time = 0.f;
 

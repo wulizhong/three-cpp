@@ -28,7 +28,7 @@
 
 namespace three {
 
-class THREE_DECL Material : public NonCopyable, public DefaultEventDispatcher {
+class THREE_DECL Material : public NonCopyable, public EventDispatcher {
 
 public:
 
@@ -153,7 +153,7 @@ public:
   Material& clone( Material& material ) const;
 
   void dispose() {
-    dispatchEvent( "dispose" );
+    dispatchEvent( TargetEvent::TARGET_DISPOSE );
   };
 
 protected:

@@ -63,17 +63,25 @@ void particles_billboards_colors( GLWindow& window, GLRenderer& renderer ) {
   /////////////////////////////////////////////////////////////////////////
 
   auto mouseX = 0.f, mouseY = 0.f;
-  window.addEventListener( SDL_MOUSEMOTION, [&]( const SDL_Event& event ) {
-    mouseX = 2.f * ( ( float )event.motion.x / renderer.width()  - 0.5f );
-    mouseY = 2.f * ( ( float )event.motion.y / renderer.height() - 0.5f );
-  } );
+  window.addEventListener( MouseEvent::MOUSE_MOVE, [&]( const Event& event ) {
 
-  window.addEventListener( SDL_WINDOWEVENT, [&]( const SDL_Event& event ) {
-    if (event.window.event != SDL_WINDOWEVENT_RESIZED) return;
-    camera->aspect = ( float )event.window.data1 / event.window.data2;
+    auto mouseEvent = static_cast<const MouseEvent&>( event );
+
+    mouseX = 2.f * ( mouseEvent.screenX / renderer.width()  - 0.5f );
+    mouseY = 2.f * ( mouseEvent.screenY / renderer.height() - 0.5f );
+
+  });
+
+  window.addEventListener( WindowEvent::WINDOW_RESIZED, [&]( const Event& event ) {
+
+    auto windowEvent = static_cast<const WindowEvent&>( event );
+
+    camera->aspect = (float)windowEvent.width / (float)windowEvent.height;
     camera->updateProjectionMatrix();
-    renderer.setSize( event.window.data1, event.window.data2 );
-  } );
+
+    renderer.setSize( windowEvent.width, windowEvent.height );
+
+  });
 
   /////////////////////////////////////////////////////////////////////////
 

@@ -5,6 +5,8 @@
 
 #include <three/utils/macros.h>
 
+#include <three/constants.h>
+
 #include <three/fwd.h>
 
 #endif // THREE_COMMON_H

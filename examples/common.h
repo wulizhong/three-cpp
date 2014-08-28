@@ -13,6 +13,8 @@
 #include "examples/extras/sdl.h"
 #include "examples/extras/stats.h"
 
+#include "three/events/events.h"
+
 namespace three_examples {
 
 template <typename Example>

@@ -7,7 +7,7 @@ namespace three {
 
 typedef unsigned Buffer;
 
-typedef std::string EventType;
+typedef unsigned int EventType;
 
 namespace THREE {
 

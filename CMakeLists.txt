@@ -208,13 +208,13 @@ if(THREE_BUILD_TESTS)
   else()
     target_link_libraries(three_test
       debug ${GTEST_LIBS_DIR}/DebugLibs/libgtest.a
-      optimized ${GTEST_LIBS_DIR}/ReleaseLibs/libgtest.a
+      optimized ${GTEST_LIBS_DIR}/libgtest.a
     )
     target_link_libraries(three_test
       debug ${GTEST_LIBS_DIR}/DebugLibs/libgtest_main.a
-      optimized ${GTEST_LIBS_DIR}/ReleaseLibs/libgtest_main.a
+      optimized ${GTEST_LIBS_DIR}/libgtest_main.a
     )
   endif()
   target_link_libraries(three_test ${THREE_LIB})
-  add_test(threetest ${THREE_BINARY_PATH}/three_tests -V)
+  add_test(threetest ${THREE_BINARY_PATH}/three_test -VV)
 endif()

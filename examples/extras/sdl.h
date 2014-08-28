@@ -17,16 +17,11 @@
 namespace three_examples {
 
 using namespace three;
-    
-typedef SDL_Event                         SdlEvent;
+
 typedef SDL_EventType                     SdlEventType;
 
-typedef three::EventDispatcher<unsigned int, SdlEvent> SdlEventDispatcher;
-typedef three::EventListener<SdlEvent> SdlEventListener;
-    
-class GLWindow : public three::NonCopyable, public SdlEventDispatcher {
+class GLWindow : public three::NonCopyable, public EventDispatcher {
 public:
-  
 
   GLWindow( const three::RendererParameters& );
   ~GLWindow();
@@ -41,6 +36,8 @@ public:
 private:
   void swapBuffers();
   bool processEvents();
+  MouseEvent mapMouseEvent( const SDL_Event& sdlEvent, const EventType type) const;
+  WindowEvent mapWindowEvent( const SDL_Event& sdlEvent, const EventType type) const;
 
   SDL_Window* window;
   SDL_GLContext context;

@@ -4,12 +4,14 @@
 #include "three/core/clock.h"
 #include "three/renderers/renderer_parameters.h"
 #include "three/renderers/gl_renderer.h"
+#include "three/events/events.h"
 
 #include "examples/extras/stats.h"
 
 // TODO(jdduke): Include gles where appropriate.
 #include <SDL2/SDL_assert.h>
 #include <SDL2/SDL_timer.h>
+#include <sstream>
 
 #define M_CONC(A, B) M_CONC_(A, B)
 #define M_CONC_(A, B) A##B
@@ -39,7 +41,7 @@ GLWindow::GLWindow( const RendererParameters& parameters )
     : window( nullptr ),
       context( nullptr ),
       renderStats( true ) {
-          
+
   if ( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_EVENTS ) < 0 ) {
     console().error() << "Unable to initialize SDL: " << SDL_GetError();
     return;
@@ -49,7 +51,7 @@ GLWindow::GLWindow( const RendererParameters& parameters )
   SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 1 );
   SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY );
   SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 24 );
-  
+
   if ( parameters.vsync )
     SDL_GL_SetSwapInterval( 1 );
 
@@ -132,13 +134,19 @@ void GLWindow::swapBuffers() {
 }
 
 bool GLWindow::processEvents() {
-  SDL_Event event;
-  while ( SDL_PollEvent( &event ) ) {
-    if ( event.type == SDL_QUIT )
+
+  if(listeners.empty()) {
+    return true;
+  }
+
+  SDL_Event sdlEvent;
+
+  while ( SDL_PollEvent( &sdlEvent ) ) {
+    if ( sdlEvent.type == SDL_QUIT )
       return false;
 
-    if ( event.type == SDL_KEYDOWN ) {
-      switch ( event.key.keysym.sym ) {
+    if ( sdlEvent.type == SDL_KEYDOWN ) {
+      switch ( sdlEvent.key.keysym.sym ) {
         case SDLK_q:
         case SDLK_ESCAPE:
           return false;
@@ -148,18 +156,172 @@ bool GLWindow::processEvents() {
       };
     }
 
-    auto type = (unsigned int)event.type;
-      
-    auto eventTypeListenersIt = listeners.find( type  );
-    if ( eventTypeListenersIt == listeners.end() ) {
+    EventType type;
+
+    switch(sdlEvent.type) {
+
+      case SDL_MOUSEMOTION:
+        type = MouseEvent::MOUSE_MOVE;
+        break;
+      case SDL_MOUSEBUTTONDOWN:
+        type = MouseEvent::MOUSE_DOWN;
+        break;
+
+      case SDL_MOUSEBUTTONUP:
+        type = MouseEvent::MOUSE_UP;
+        break;
+
+      case SDL_MOUSEWHEEL:
+        type = MouseEvent::MOUSE_WHEEL;
+        break;
+
+      case SDL_WINDOWEVENT:
+
+        switch (sdlEvent.window.event) {
+        // SIZE_CHANGED?
+        case SDL_WINDOWEVENT_RESIZED:
+            type = WindowEvent::WINDOW_RESIZED;
+            break;
+        case SDL_WINDOWEVENT_ENTER:
+            type = WindowEvent::WINDOW_ENTER;
+            break;
+        case SDL_WINDOWEVENT_LEAVE:
+            type = WindowEvent::WINDOW_LEAVE;
+            break;
+        case SDL_WINDOWEVENT_FOCUS_GAINED:
+            type = WindowEvent::WINDOW_FOCUS_GAINED;
+            break;
+        case SDL_WINDOWEVENT_FOCUS_LOST:
+            type = WindowEvent::WINDOW_FOCUS_LOST;
+            break;
+        case SDL_WINDOWEVENT_SHOWN:
+            type = WindowEvent::WINDOW_SHOWN;
+            break;
+        case SDL_WINDOWEVENT_HIDDEN:
+            type = WindowEvent::WINDOW_HIDDEN;
+            break;
+        case SDL_WINDOWEVENT_EXPOSED:
+            type = WindowEvent::WINDOW_EXPOSED;
+            break;
+        case SDL_WINDOWEVENT_MOVED:
+            type = WindowEvent::WINDOW_MOVED;
+            break;
+        case SDL_WINDOWEVENT_MINIMIZED:
+            type = WindowEvent::WINDOW_MINIMIZED;
+            break;
+        case SDL_WINDOWEVENT_MAXIMIZED:
+            type = WindowEvent::WINDOW_MAXIMIZED;
+            break;
+        case SDL_WINDOWEVENT_RESTORED:
+            type = WindowEvent::WINDOW_RESTORED;
+            break;
+        case SDL_WINDOWEVENT_CLOSE:
+            type = WindowEvent::WINDOW_CLOSE;
+            break;
+        default:
+            continue;
+        }
+
+        break;
+
+      default:
+        continue;
+    }
+
+    if ( listeners.find( type ) == listeners.cend() ) {
       continue;
     }
-      
-    for ( const auto& listener : eventTypeListenersIt->second ) {
-      listener( event );
+
+    switch(sdlEvent.type) {
+      case SDL_MOUSEMOTION: {
+      case SDL_MOUSEBUTTONDOWN: 
+      case SDL_MOUSEBUTTONUP: 
+      case SDL_MOUSEWHEEL: 
+        auto mouseEvent = mapMouseEvent( sdlEvent, type );
+        dispatchEvent(mouseEvent);
+        break;
+      }
+      case SDL_WINDOWEVENT: {
+        auto windowEvent = mapWindowEvent( sdlEvent, type );
+        dispatchEvent(windowEvent);
+        break;
+      }
+      default:
+        continue;
     }
+
   }
+
   return true;
+}
+
+MouseEvent GLWindow::mapMouseEvent( const SDL_Event& sdlEvent, const EventType type) const {
+
+  // TODO Map properly
+  auto me = MouseEvent(type, sdlEvent.common.timestamp, MouseButton::NONE, sdlEvent.motion.state,
+        sdlEvent.motion.x, sdlEvent.motion.y, sdlEvent.motion.xrel, sdlEvent.motion.yrel);
+  return me;
+
+  // switch(sdlEvent.type) {
+
+  //   case SDL_MOUSEMOTION: {
+  //     return me;
+  //   }
+  //   case SDL_MOUSEBUTTONDOWN: {
+  //     return Event();
+  //   }
+  //   case SDL_MOUSEBUTTONUP: {
+  //     return Event();
+  //   }
+  //   case SDL_MOUSEWHEEL: {
+  //     return Event();
+  //   }
+  //   default: {
+  //     return Event();
+  //   }
+  // }
+
+  // return Event(); 
+}
+
+WindowEvent GLWindow::mapWindowEvent( const SDL_Event& sdlEvent, const EventType type ) const {
+
+  WindowEvent event = WindowEvent(type, (unsigned int)sdlEvent.common.timestamp);
+
+  switch (sdlEvent.window.event) {
+    case SDL_WINDOWEVENT_RESIZED:
+      event.width = sdlEvent.window.data1;
+      event.height = sdlEvent.window.data2;
+        break;
+    case SDL_WINDOWEVENT_ENTER:
+        break;
+    case SDL_WINDOWEVENT_LEAVE:
+        break;
+    case SDL_WINDOWEVENT_FOCUS_GAINED:
+        break;
+    case SDL_WINDOWEVENT_FOCUS_LOST:
+        break;
+    case SDL_WINDOWEVENT_SHOWN:
+        break;
+    case SDL_WINDOWEVENT_HIDDEN:
+        break;
+    case SDL_WINDOWEVENT_EXPOSED:
+        break;
+    case SDL_WINDOWEVENT_MOVED:
+        break;
+    case SDL_WINDOWEVENT_MINIMIZED:
+        break;
+    case SDL_WINDOWEVENT_MAXIMIZED:
+        break;
+    case SDL_WINDOWEVENT_RESTORED:
+        break;
+    case SDL_WINDOWEVENT_CLOSE:
+        break;
+    default:
+        break;
+  }
+
+  return event;
 }
 
 } // namespace three_examples

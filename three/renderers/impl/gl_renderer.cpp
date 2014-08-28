@@ -45,6 +45,8 @@
 #include <three/utils/conversion.h>
 #include <three/utils/template.h>
 
+#include <three/events/events.h>
+
 #ifndef NDEBUG
 #define GL_CALL(a) (a); _gl.Error(__FILE__, __LINE__)
 #else
@@ -243,7 +245,7 @@ void GLRenderer::setDefaultGLState() {
   _gl.BlendEquation( GL_FUNC_ADD );
   _gl.BlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
-  // TODO Viewport values are 0/-1 here. 
+  // TODO Viewport values are 0/-1 here.
   //_gl.Viewport( _viewportX, _viewportY, _viewportWidth, _viewportHeight );
 
   _gl.ClearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
@@ -2381,7 +2383,7 @@ void GLRenderer::renderBuffer( Camera& camera, Lights& lights, IFog* fog, Materi
     if ( (index = attributes[AttributeKey::color()]) >= 0 ) {
 
       if( ! object.geometry->colors.empty()) {
-            
+
         _gl.BindBuffer( GL_ARRAY_BUFFER, geometryGroup.__glColorBuffer );
         enableAttribute( attributes[AttributeKey::color()] );
         _gl.VertexAttribPointer( index, 3, GL_FLOAT, false, 0, 0 );
@@ -3201,8 +3203,8 @@ void GLRenderer::addObject( Object3D& object, Scene& scene ) {
 
     geometry.__glInit = true;
 
-    object.geometry->addEventListener( "dispose", std::bind(&GLRenderer::onGeometryDispose, this, std::placeholders::_1 ) );
-      
+    object.geometry->addEventListener( TargetEvent::TARGET_DISPOSE, std::bind(&GLRenderer::onGeometryDispose, this, std::placeholders::_1 ) );
+
     if ( geometry.type() == THREE::BufferGeometry ) {
 
         initDirectBuffers( geometry );
@@ -3464,7 +3466,7 @@ void GLRenderer::removeInstancesDirect( RenderListDirect& objlist, Object3D& obj
 
 void GLRenderer::initMaterial( Material& material, Lights& lights, IFog* fog, Object3D& object ) {
 
-  material.addEventListener( "dispose", std::bind(&GLRenderer::onMaterialDispose, this, std::placeholders::_1) );
+  material.addEventListener( TargetEvent::TARGET_DISPOSE, std::bind(&GLRenderer::onMaterialDispose, this, std::placeholders::_1) );
 
   std::string shaderID;
 
@@ -4967,8 +4969,8 @@ void GLRenderer::setTexture( Texture& texture, int slot ) {
     if ( ! texture.__glInit ) {
 
       texture.__glInit = true;
-        
-      texture.addEventListener( "dispose", std::bind(&GLRenderer::onTextureDispose, this, std::placeholders::_1) );
+
+      texture.addEventListener( TargetEvent::TARGET_DISPOSE, std::bind(&GLRenderer::onTextureDispose, this, std::placeholders::_1) );
 
       texture.__glTexture = _gl.CreateTexture();
 
@@ -5059,8 +5061,8 @@ void GLRenderer::setCubeTexture( Texture& texture, int slot ) {
     if ( texture.needsUpdate() ) {
 
       if ( ! texture.__glTextureCube ) {
-          
-        texture.addEventListener( "dispose", std::bind(&GLRenderer::onTextureDispose, this, std::placeholders::_1) );
+
+        texture.addEventListener( TargetEvent::TARGET_DISPOSE, std::bind(&GLRenderer::onTextureDispose, this, std::placeholders::_1) );
 
         texture.__glTextureCube = _gl.CreateTexture();
 
@@ -5173,8 +5175,8 @@ void GLRenderer::setRenderTarget( const GLRenderTarget::Ptr& renderTarget ) {
   auto isCube = false;// TODO: ( renderTarget.type() == THREE::WebglRenderTargetCube );
 
   if ( renderTarget && renderTarget->__glFramebuffer.size() == 0 ) {
-      
-    renderTarget->addEventListener( "dispose", std::bind(&GLRenderer::onRenderTargetDispose, this, std::placeholders::_1) );
+
+    renderTarget->addEventListener( TargetEvent::TARGET_DISPOSE, std::bind(&GLRenderer::onRenderTargetDispose, this, std::placeholders::_1) );
 
     renderTarget->__glTexture = _gl.CreateTexture();
 
