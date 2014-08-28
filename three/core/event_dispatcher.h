@@ -80,7 +80,8 @@ public:
 
   }
 
-  void dispatchEvent( const EventType type, const Event& event ) {
+  template<typename TEvent>
+  void dispatchEvent( const EventType type, const TEvent& event ) {
 
     auto typeListeners = listeners.find( type );
 

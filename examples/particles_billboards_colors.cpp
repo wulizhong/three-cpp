@@ -67,8 +67,8 @@ void particles_billboards_colors( GLWindow& window, GLRenderer& renderer ) {
 
     auto mouseEvent = static_cast<const MouseEvent&>( event );
 
-    mouseX = 2.f * ( mouseEvent.movementX / renderer.width()  - 0.5f );
-    mouseY = 2.f * ( mouseEvent.movementY / renderer.height() - 0.5f );
+    mouseX = 2.f * ( mouseEvent.screenX / renderer.width()  - 0.5f );
+    mouseY = 2.f * ( mouseEvent.screenY / renderer.height() - 0.5f );
 
   });
 

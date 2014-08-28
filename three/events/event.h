@@ -8,8 +8,6 @@ namespace three {
 class Event {
 public:
 
-  // TODO: Abstract?
-  Event() {}
   virtual ~Event() {};
 
 };

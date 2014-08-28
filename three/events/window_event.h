@@ -25,7 +25,8 @@ public:
   static const EventType WINDOW_FOCUS_LOST;
   static const EventType WINDOW_CLOSE;
 
-  WindowEvent( const EventType type, unsigned int timestamp, unsigned int width = 0, unsigned int height = 0,
+  WindowEvent( const EventType type, unsigned int timestamp, 
+                unsigned int width = 0, unsigned int height = 0,
                 Vector2 position = Vector2() )
     : UiEvent( type, timestamp ),
       width( width ),

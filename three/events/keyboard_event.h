@@ -14,7 +14,8 @@ public:
   static const EventType KEY_UP;
   static const EventType KEY_DOWN;
 
-  KeyboardEvent( const EventType type, unsigned int timestamp, unsigned int key, bool repeat = false )
+  KeyboardEvent( const EventType type, unsigned int timestamp, unsigned int key, 
+                 bool repeat = false )
     : InputEvent( type, timestamp ),
       key( key ),
       repeat( repeat ) {}

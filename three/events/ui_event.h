@@ -9,7 +9,7 @@ namespace three {
 class UiEvent : public CoreEvent {
 public:
 
-  UiEvent( const EventType type, unsigned int timestamp)
+  UiEvent( const EventType type, unsigned int timestamp )
     : CoreEvent( type ),
       timestamp( timestamp ) {}
 

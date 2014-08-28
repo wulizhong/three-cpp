@@ -178,6 +178,10 @@ bool GLWindow::processEvents() {
       case SDL_WINDOWEVENT:
 
         switch (sdlEvent.window.event) {
+        // SIZE_CHANGED?
+        case SDL_WINDOWEVENT_RESIZED:
+            type = WindowEvent::WINDOW_RESIZED;
+            break;
         case SDL_WINDOWEVENT_ENTER:
             type = WindowEvent::WINDOW_ENTER;
             break;
@@ -202,9 +206,6 @@ bool GLWindow::processEvents() {
         case SDL_WINDOWEVENT_MOVED:
             type = WindowEvent::WINDOW_MOVED;
             break;
-        case SDL_WINDOWEVENT_RESIZED:
-            type = WindowEvent::WINDOW_RESIZED;
-            break;
         case SDL_WINDOWEVENT_MINIMIZED:
             type = WindowEvent::WINDOW_MINIMIZED;
             break;
@@ -221,32 +222,107 @@ bool GLWindow::processEvents() {
             continue;
         }
 
-        // construct window event
-
         break;
 
       default:
         continue;
     }
 
-    auto eventTypeListenersIt = listeners.find( type );
-    if ( eventTypeListenersIt == listeners.end() ) {
+    if ( listeners.find( type ) == listeners.cend() ) {
       continue;
     }
 
-    Event event = mapEvent(sdlEvent, type);
-
-    for ( const auto& listener : eventTypeListenersIt->second ) {
-      (*listener)( SdlEvent(sdlEvent) );
+    switch(sdlEvent.type) {
+      case SDL_MOUSEMOTION: {
+      case SDL_MOUSEBUTTONDOWN: 
+      case SDL_MOUSEBUTTONUP: 
+      case SDL_MOUSEWHEEL: 
+        auto mouseEvent = mapMouseEvent( sdlEvent, type );
+        dispatchEvent(mouseEvent);
+        break;
+      }
+      case SDL_WINDOWEVENT: {
+        auto windowEvent = mapWindowEvent( sdlEvent, type );
+        dispatchEvent(windowEvent);
+        break;
+      }
+      default:
+        continue;
     }
+
   }
+
   return true;
 }
 
-Event GLWindow::mapEvent( const SDL_Event& sdlEvent, const EventType type) {
-  return Event();
+MouseEvent GLWindow::mapMouseEvent( const SDL_Event& sdlEvent, const EventType type) const {
+
+  // TODO Map properly
+  auto me = MouseEvent(type, sdlEvent.common.timestamp, MouseButton::NONE, sdlEvent.motion.state,
+        sdlEvent.motion.x, sdlEvent.motion.y, sdlEvent.motion.xrel, sdlEvent.motion.yrel);
+  return me;
+
+  // switch(sdlEvent.type) {
+
+  //   case SDL_MOUSEMOTION: {
+  //     return me;
+  //   }
+  //   case SDL_MOUSEBUTTONDOWN: {
+  //     return Event();
+  //   }
+  //   case SDL_MOUSEBUTTONUP: {
+  //     return Event();
+  //   }
+  //   case SDL_MOUSEWHEEL: {
+  //     return Event();
+  //   }
+  //   default: {
+  //     return Event();
+  //   }
+  // }
+
+  // return Event(); 
 }
 
+WindowEvent GLWindow::mapWindowEvent( const SDL_Event& sdlEvent, const EventType type ) const {
+
+  WindowEvent event = WindowEvent(type, (unsigned int)sdlEvent.common.timestamp);
+
+  switch (sdlEvent.window.event) {
+    case SDL_WINDOWEVENT_RESIZED:
+      event.width = sdlEvent.window.data1;
+      event.height = sdlEvent.window.data2;
+        break;
+    case SDL_WINDOWEVENT_ENTER:
+        break;
+    case SDL_WINDOWEVENT_LEAVE:
+        break;
+    case SDL_WINDOWEVENT_FOCUS_GAINED:
+        break;
+    case SDL_WINDOWEVENT_FOCUS_LOST:
+        break;
+    case SDL_WINDOWEVENT_SHOWN:
+        break;
+    case SDL_WINDOWEVENT_HIDDEN:
+        break;
+    case SDL_WINDOWEVENT_EXPOSED:
+        break;
+    case SDL_WINDOWEVENT_MOVED:
+        break;
+    case SDL_WINDOWEVENT_MINIMIZED:
+        break;
+    case SDL_WINDOWEVENT_MAXIMIZED:
+        break;
+    case SDL_WINDOWEVENT_RESTORED:
+        break;
+    case SDL_WINDOWEVENT_CLOSE:
+        break;
+    default:
+        break;
+  }
+
+  return event;
+}
 
 } // namespace three_examples
 

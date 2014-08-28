@@ -2,6 +2,7 @@
 #define THREE_CORE_KEYCODES_H
 
 // Key codes and modifiers based on SDL's 2.0 lookup table
+// Should map 1-on-1
 // https://wiki.libsdl.org/SDLKeycodeLookup
 // For license see externals/sdl-*/license.txt
 
@@ -259,7 +260,7 @@ enum {
   KEY_MOD_CAPS = 0x2000,
   KEY_MOD_MODE = 0x4000,
   KEY_MOD_RESERVED = 0x8000,
-  KEY_MODE_LAST
+  KEY_MOD_LAST
 } KeyMod;
 
 #define KEY_MOD_CTRL (KEY_MOD_LCTRL|KEY_MOD_RCTRL)
