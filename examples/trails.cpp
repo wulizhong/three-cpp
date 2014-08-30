@@ -10,7 +10,7 @@
 using namespace three;
 using namespace three_examples;
 
-void trails( GLWindow& window, GLRenderer& renderer ) {
+void trails( SdlWindow& window, GLRenderer& renderer ) {
 
   renderer.sortObjects = false;
   renderer.autoClearColor = false;

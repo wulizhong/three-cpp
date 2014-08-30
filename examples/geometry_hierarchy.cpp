@@ -14,7 +14,7 @@
 using namespace three;
 using namespace three_examples;
 
-void geometry_hierarchy( GLWindow& window, GLRenderer& renderer ) {
+void geometry_hierarchy( SdlWindow& window, GLRenderer& renderer ) {
 
   renderer.sortObjects = false;
 

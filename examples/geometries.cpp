@@ -29,7 +29,7 @@
 using namespace three;
 using namespace three_examples;
 
-void geometries( GLWindow& window, GLRenderer& renderer ) {
+void geometries( SdlWindow& window, GLRenderer& renderer ) {
 
   auto camera = PerspectiveCamera::create(
     45, ( float )renderer.width() / renderer.height(), 10, 20000

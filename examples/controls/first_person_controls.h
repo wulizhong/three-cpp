@@ -15,12 +15,12 @@ using namespace std::placeholders;
 class FirstPersonControls : NonCopyable {
 public:
 
-  static std::shared_ptr<FirstPersonControls> create( const std::shared_ptr<Object3D>& object, GLWindow& window ) {
+  static std::shared_ptr<FirstPersonControls> create( const std::shared_ptr<Object3D>& object, SdlWindow& window ) {
     return std::shared_ptr<FirstPersonControls>( new FirstPersonControls(object, window) );
   }
 
   std::shared_ptr<Object3D> object;
-  GLWindow& window;
+  SdlWindow& window;
 
   std::array<std::shared_ptr<EventListener>, 5> listeners;
 
@@ -273,7 +273,7 @@ public:
   };
 
 protected:
-  explicit FirstPersonControls( const std::shared_ptr<Object3D>& object, GLWindow& window )
+  explicit FirstPersonControls( const std::shared_ptr<Object3D>& object, SdlWindow& window )
     : object( object ),
       window( window ),
       target( Vector3() ),

@@ -68,7 +68,7 @@ void main( void ) {\
 using namespace three;
 using namespace three_examples;
 
-void shader_lava( GLWindow& window, GLRenderer& renderer ) {
+void shader_lava( SdlWindow& window, GLRenderer& renderer ) {
 
   auto camera = PerspectiveCamera::create(
     40, (float)renderer.width() / renderer.height(), 1, 3000

@@ -1,5 +1,5 @@
-#ifndef THREE_EXAMPLES_SDL_H
-#define THREE_EXAMPLES_SDL_H
+#ifndef THREE_PACKAGES_SDL_SDL_WINDOW_H
+#define THREE_PACKAGES_SDL_SDL_WINDOW_H
 
 #include "three/gl.h"
 #include "three/math/color.h"
@@ -7,31 +7,31 @@
 #include "three/core/event_dispatcher.h"
 #include "three/renderers/renderer_parameters.h"
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_events.h>
+#include <SDL.h>
+#include <SDL_events.h>
 
 #include <functional>
 #include <map>
 #include <vector>
 
-namespace three_examples {
+namespace three {
+namespace packages {
 
 using namespace three;
 
 typedef SDL_EventType                     SdlEventType;
 
-class GLWindow : public three::NonCopyable, public EventDispatcher {
+class SdlWindow : public three::NonCopyable, public EventDispatcher {
 public:
 
-  GLWindow( const three::RendererParameters& );
-  ~GLWindow();
+  SdlWindow( const three::RendererParameters& );
+  virtual ~SdlWindow();
 
   three::GLInterface createGLInterface();
 
-  typedef std::function<bool(float)> Update;
-  void animate( Update update );
+  virtual void animate( Update update );
 
-  bool valid() const;
+  virtual bool valid() const;
 
 private:
   void swapBuffers();
@@ -40,12 +40,15 @@ private:
   WindowEvent mapWindowEvent( const SDL_Event& sdlEvent, const EventType type) const;
 
   SDL_Window* window;
+
   SDL_GLContext context;
+
   bool renderStats;
+
 };
 
 
+} // end namespace packages
+} // end namespace three
 
-} // namespace three_examples
-
-#endif // THREE_EXAMPLES_SDL_H
+#endif // THREE_PACKAGES_SDL_SDL_WINDOW_H

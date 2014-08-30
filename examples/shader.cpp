@@ -54,7 +54,7 @@ void main() { \
 using namespace three;
 using namespace three_examples;
 
-void shader( GLWindow& window, GLRenderer& renderer ) {
+void shader( SdlWindow& window, GLRenderer& renderer ) {
 
   auto camera = Camera::create();
   camera->position().z = 1;

@@ -170,7 +170,7 @@ if (ANDROID)
   add_definitions(-DTHREE_GLES)
 endif()
 
-# TODO Refactor, add groupings, etc
+# FIXME
 file(GLOB_RECURSE THREE_SOURCES three/*.cpp)
 file(GLOB_RECURSE THREE_HEADERS three/*.h)
 
@@ -179,6 +179,8 @@ set(THREE_LIB_SOURCE_FILES ${THREE_SOURCES} ${THREE_HEADERS})
 set(THREE_LIB three)
 three_add_library(${THREE_LIB} ${THREE_LIB_SOURCE_FILES})
 set_target_properties(${THREE_LIB} PROPERTIES COMPILE_DEFINITIONS "THREE_SOURCE")
+
+add_subdirectory(packages/sdl)
 
 if(THREE_BUILD_EXAMPLES)
   add_subdirectory(examples)

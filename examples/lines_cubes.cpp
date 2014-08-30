@@ -67,7 +67,7 @@ std::vector<Vector3> hilbert3D( Vector3 center,
 }
 
 
-void lines_cubes( GLWindow& window, GLRenderer& renderer ) {
+void lines_cubes( SdlWindow& window, GLRenderer& renderer ) {
 
   auto scene = Scene::create();
 

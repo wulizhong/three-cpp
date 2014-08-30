@@ -14,7 +14,7 @@
 using namespace three;
 using namespace three_examples;
 
-void lines_sphere( GLWindow& window, GLRenderer& renderer ) {
+void lines_sphere( SdlWindow& window, GLRenderer& renderer ) {
 
   auto camera = PerspectiveCamera::create(
     80, (float)renderer.width() / renderer.height(), 1, 3000

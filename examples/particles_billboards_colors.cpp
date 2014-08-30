@@ -13,7 +13,7 @@
 using namespace three;
 using namespace three_examples;
 
-void particles_billboards_colors( GLWindow& window, GLRenderer& renderer ) {
+void particles_billboards_colors( SdlWindow& window, GLRenderer& renderer ) {
 
   auto camera = PerspectiveCamera::create(
     50, ( float )renderer.width() / renderer.height(), 1.f, 3000

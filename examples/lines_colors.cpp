@@ -61,7 +61,7 @@ std::vector<Vector3> hilbert3D( Vector3 center,
 
 /////////////////////////////////////////////////////////////////////////
 
-void lines_colors( GLWindow& window, GLRenderer& renderer ) {
+void lines_colors( SdlWindow& window, GLRenderer& renderer ) {
 
   renderer.sortObjects = false;
 

@@ -10,17 +10,19 @@
 #include "three/utils/conversion.h"
 #include "three/utils/template.h"
 
-#include "examples/extras/sdl.h"
+#include "packages/sdl/sdl_window.h"
 #include "examples/extras/stats.h"
 
 #include "three/events/events.h"
 
 namespace three_examples {
 
+using namespace three::packages;
+
 template <typename Example>
 int RunExample( Example example,
                 three::RendererParameters parameters = three::RendererParameters() ) {
-  GLWindow window( parameters );
+  SdlWindow window( parameters );
   if ( !window.valid() )
     return EXIT_FAILURE;
 

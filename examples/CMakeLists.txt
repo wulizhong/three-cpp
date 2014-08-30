@@ -21,7 +21,7 @@ include_directories(${SDL2_INCLUDE_DIR})
 include_directories(${OPENGL_INCLUDE_DIR})
 include_directories(${RAPID_JSON_INCLUDE_DIR})
 
-set(THREE_EXAMPLE_DEP_LIBS ${THREE_LIB} ${OPENGL_LIBRARIES} ${SDL2_LIBRARY} ${SDLMAIN_LIBRARY})
+set(THREE_EXAMPLE_DEP_LIBS three three_package_sdl)
 
 ## TODO: Remove hard-wired data directory path
 set(THREE_RELEASE_BUILD FALSE CACHE BOOL
@@ -34,40 +34,6 @@ else()
 endif()
 
 #############
-
-# Copy SDL runtime on Windows
-if (MSVC OR MINGW)
-  if (THREE_BUILD_EXAMPLES OR THREE_BUILD_TESTS)
-    get_filename_component(SDL2_PATH ${SDL2MAIN_LIBRARY} PATH)
-    set(SDL2_RUNTIME_LIBRARY "${SDL2_PATH}/SDL2.dll" CACHE INTERNAL "" FORCE)
-    message (STATUS "Copying ${SDL2_RUNTIME_LIBRARY} to ${THREE_BINARY_PATH} \n")
-    set(THREE_DEPENDS three_depends)
-    if (MSVC)
-      #add_custom_command(
-      add_custom_target(
-        ${THREE_DEPENDS}
-        COMMAND ${CMAKE_COMMAND} -E make_directory "${THREE_BINARY_PATH}/$<CONFIGURATION>"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${SDL2_RUNTIME_LIBRARY} "${THREE_BINARY_PATH}/$<CONFIGURATION>"
-        COMMENT "Copying ${SDL2_RUNTIME_LIBRARY}")
-    else()
-      add_custom_target(
-        ${THREE_DEPENDS}
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${THREE_BINARY_PATH}
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${SDL2_RUNTIME_LIBRARY} "${THREE_BINARY_PATH}"
-        COMMENT "Copying ${SDL2_RUNTIME_LIBRARY}")
-    endif()
-  endif()
-endif()
-
-#if(APPLE)
-#  if (${CMAKE_GENERATOR} STREQUAL Xcode OR NOT SDLMAIN_LIBRARY)
-#    remove_cxx_flag("${THREE_CXX_FLAGS}")
-#    add_library(apple_sdlmain_library STATIC ../externals/sdl2-2.0.3/xcode/SDLMain.m)
-#    set(THREE_EXAMPLE_DEP_LIBS ${THREE_EXAMPLE_DEP_LIBS} apple_sdl2main_library)
-#  endif()
-#  find_library(COCOA_LIBRARY Cocoa)
-#  set(THREE_EXAMPLE_DEP_LIBS ${THREE_EXAMPLE_DEP_LIBS} ${COCOA_LIBRARY})
-#endif()
 
 file(GLOB_RECURSE THREE_EXAMPLES_LIB_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/extras/*.cpp)
 file(GLOB_RECURSE THREE_EXAMPLES_LIB_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/extras/*.h)

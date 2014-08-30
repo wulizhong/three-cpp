@@ -12,7 +12,7 @@
 using namespace three;
 using namespace three_examples;
 
-void simple( GLWindow& window, GLRenderer& renderer ) {
+void simple( SdlWindow& window, GLRenderer& renderer ) {
 
   // Camera
   auto camera = PerspectiveCamera::create(

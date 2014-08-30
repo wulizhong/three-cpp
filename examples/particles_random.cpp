@@ -11,7 +11,7 @@
 using namespace three;
 using namespace three_examples;
 
-void particles_random( GLWindow& window, GLRenderer& renderer ) {
+void particles_random( SdlWindow& window, GLRenderer& renderer ) {
 
   auto camera = PerspectiveCamera::create(
     75, ( float )renderer.width() / renderer.height(), 1.f, 3000

@@ -17,7 +17,7 @@
 using namespace three;
 using namespace three_examples;
 
-void misc_sound( GLWindow& window, GLRenderer& renderer ) {
+void misc_sound( SdlWindow& window, GLRenderer& renderer ) {
 
   auto camera = PerspectiveCamera::create(
     50, ( float )renderer.width() / renderer.height(), 2.f, 2000

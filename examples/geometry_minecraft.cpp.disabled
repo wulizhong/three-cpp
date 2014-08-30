@@ -40,7 +40,7 @@ std::vector<float> generateHeight( int width, int height ) {
 }
 
 
-void geometry_minecraft( GLWindow& window, GLRenderer& renderer ) {
+void geometry_minecraft( SdlWindow& window, GLRenderer& renderer ) {
 
   const auto worldWidth = 128;
   const auto worldDepth = 128;

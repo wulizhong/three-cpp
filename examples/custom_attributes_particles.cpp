@@ -34,7 +34,7 @@ const std::string fragmentShader =
 using namespace three;
 using namespace three_examples;
 
-void shader( GLWindow& window, GLRenderer& renderer ) {
+void shader( SdlWindow& window, GLRenderer& renderer ) {
 
  auto camera = PerspectiveCamera::create(
     60, ( float )renderer.width() / renderer.height(), 1, 10000

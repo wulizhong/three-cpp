@@ -28,7 +28,7 @@ Image createImage( int width = 256, int height = 256 ) {
   return Image( std::move(canvas), width, height );
 }
 
-void test_memory( GLWindow& window, GLRenderer& renderer ) {
+void test_memory( SdlWindow& window, GLRenderer& renderer ) {
 
 
   //////////////////////////////////////////////////////////////////////////
