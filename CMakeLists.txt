@@ -10,7 +10,7 @@ include(${PROJECT_SOURCE_DIR}/cmake/ThreeTargets.cmake)
 set(THREE_VERSION 0.0.1 CACHE STRING "three.cpp version")
 dissect_version()
 
-set(THREE_TREAT_WARNINGS_AS_ERRORS TRUE CACHE BOOL "Treat warnings as errors")
+set(THREE_WARNINGS_AS_ERRORS TRUE CACHE BOOL "Treat warnings as errors")
 set(THREE_BUILD_EXAMPLES     TRUE CACHE BOOL "Build three.cpp examples")
 set(THREE_BUILD_TESTS        FALSE CACHE BOOL "Build three.cpp unit tests")
 set(THREE_LIBRARY_STATIC     TRUE CACHE BOOL "If building three.cpp as a library, build statically")
@@ -52,7 +52,7 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLAN
 
   set(THREE_COMMON_FLAGS "${THREE_COMMON_FLAGS} -Wall -Wno-missing-braces -Wno-unused-private-field")
 
-  if(THREE_TREAT_WARNINGS_AS_ERRORS)
+  if(THREE_WARNINGS_AS_ERRORS)
     set(THREE_COMMON_FLAGS "${THREE_COMMON_FLAGS} -Werror")
   endif()
 

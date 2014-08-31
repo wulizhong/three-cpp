@@ -1,6 +1,3 @@
-#ifndef THREE_EVENTS_TARGET_EVENT_CPP
-#define THREE_EVENTS_TARGET_EVENT_CPP
-
 #include <three/events/target_event.h>
 
 namespace three {
@@ -13,5 +10,3 @@ namespace three {
 
 
 } // end namespace three
-
-#endif // THREE_EVENTS_TARGET_EVENT_CPP

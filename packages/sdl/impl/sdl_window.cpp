@@ -1,5 +1,5 @@
-
 #include "packages/sdl/sdl_window.h"
+#include "packages/sdl/sdl_event_mapper.h"
 
 #include "three/console.h"
 #include "three/core/clock.h"
@@ -83,6 +83,8 @@ SdlWindow::SdlWindow( const RendererParameters& parameters )
     return;
   }
 
+  eventMapper = std::unique_ptr<SdlEventMapper>(new SdlEventMapper());
+
   console().log() << "SDL initialized";
 }
 
@@ -159,76 +161,10 @@ bool SdlWindow::processEvents() {
       };
     }
 
-    EventType type;
-
-    switch(sdlEvent.type) {
-
-      case SDL_MOUSEMOTION:
-        type = MouseEvent::MOUSE_MOVE;
-        break;
-      case SDL_MOUSEBUTTONDOWN:
-        type = MouseEvent::MOUSE_DOWN;
-        break;
-
-      case SDL_MOUSEBUTTONUP:
-        type = MouseEvent::MOUSE_UP;
-        break;
-
-      case SDL_MOUSEWHEEL:
-        type = MouseEvent::MOUSE_WHEEL;
-        break;
-
-      case SDL_WINDOWEVENT:
-
-        switch (sdlEvent.window.event) {
-        // SIZE_CHANGED?
-        case SDL_WINDOWEVENT_RESIZED:
-            type = WindowEvent::WINDOW_RESIZED;
-            break;
-        case SDL_WINDOWEVENT_ENTER:
-            type = WindowEvent::WINDOW_ENTER;
-            break;
-        case SDL_WINDOWEVENT_LEAVE:
-            type = WindowEvent::WINDOW_LEAVE;
-            break;
-        case SDL_WINDOWEVENT_FOCUS_GAINED:
-            type = WindowEvent::WINDOW_FOCUS_GAINED;
-            break;
-        case SDL_WINDOWEVENT_FOCUS_LOST:
-            type = WindowEvent::WINDOW_FOCUS_LOST;
-            break;
-        case SDL_WINDOWEVENT_SHOWN:
-            type = WindowEvent::WINDOW_SHOWN;
-            break;
-        case SDL_WINDOWEVENT_HIDDEN:
-            type = WindowEvent::WINDOW_HIDDEN;
-            break;
-        case SDL_WINDOWEVENT_EXPOSED:
-            type = WindowEvent::WINDOW_EXPOSED;
-            break;
-        case SDL_WINDOWEVENT_MOVED:
-            type = WindowEvent::WINDOW_MOVED;
-            break;
-        case SDL_WINDOWEVENT_MINIMIZED:
-            type = WindowEvent::WINDOW_MINIMIZED;
-            break;
-        case SDL_WINDOWEVENT_MAXIMIZED:
-            type = WindowEvent::WINDOW_MAXIMIZED;
-            break;
-        case SDL_WINDOWEVENT_RESTORED:
-            type = WindowEvent::WINDOW_RESTORED;
-            break;
-        case SDL_WINDOWEVENT_CLOSE:
-            type = WindowEvent::WINDOW_CLOSE;
-            break;
-        default:
-            continue;
-        }
-
-        break;
-
-      default:
-        continue;
+    EventType type = eventMapper->mapEventType(sdlEvent);
+    if( type == Event::UNKNOWN ) {
+      console().warn("SDL event not mapped");
+      continue;
     }
 
     if ( listeners.find( type ) == listeners.cend() ) {
@@ -240,12 +176,12 @@ bool SdlWindow::processEvents() {
       case SDL_MOUSEBUTTONDOWN: 
       case SDL_MOUSEBUTTONUP: 
       case SDL_MOUSEWHEEL: 
-        auto mouseEvent = mapMouseEvent( sdlEvent, type );
+        auto mouseEvent = eventMapper->mapMouseEvent( sdlEvent, type );
         dispatchEvent(mouseEvent);
         break;
       }
       case SDL_WINDOWEVENT: {
-        auto windowEvent = mapWindowEvent( sdlEvent, type );
+        auto windowEvent = eventMapper->mapWindowEvent( sdlEvent, type );
         dispatchEvent(windowEvent);
         break;
       }
@@ -256,75 +192,6 @@ bool SdlWindow::processEvents() {
   }
 
   return true;
-}
-
-MouseEvent SdlWindow::mapMouseEvent( const SDL_Event& sdlEvent, const EventType type) const {
-
-  // TODO Map properly
-  auto me = MouseEvent(type, sdlEvent.common.timestamp, MouseButton::NONE, sdlEvent.motion.state,
-        sdlEvent.motion.x, sdlEvent.motion.y, sdlEvent.motion.xrel, sdlEvent.motion.yrel);
-  return me;
-
-  // switch(sdlEvent.type) {
-
-  //   case SDL_MOUSEMOTION: {
-  //     return me;
-  //   }
-  //   case SDL_MOUSEBUTTONDOWN: {
-  //     return Event();
-  //   }
-  //   case SDL_MOUSEBUTTONUP: {
-  //     return Event();
-  //   }
-  //   case SDL_MOUSEWHEEL: {
-  //     return Event();
-  //   }
-  //   default: {
-  //     return Event();
-  //   }
-  // }
-
-  // return Event(); 
-}
-
-WindowEvent SdlWindow::mapWindowEvent( const SDL_Event& sdlEvent, const EventType type ) const {
-
-  WindowEvent event = WindowEvent(type, (unsigned int)sdlEvent.common.timestamp);
-
-  switch (sdlEvent.window.event) {
-    case SDL_WINDOWEVENT_RESIZED:
-      event.width = sdlEvent.window.data1;
-      event.height = sdlEvent.window.data2;
-        break;
-    case SDL_WINDOWEVENT_ENTER:
-        break;
-    case SDL_WINDOWEVENT_LEAVE:
-        break;
-    case SDL_WINDOWEVENT_FOCUS_GAINED:
-        break;
-    case SDL_WINDOWEVENT_FOCUS_LOST:
-        break;
-    case SDL_WINDOWEVENT_SHOWN:
-        break;
-    case SDL_WINDOWEVENT_HIDDEN:
-        break;
-    case SDL_WINDOWEVENT_EXPOSED:
-        break;
-    case SDL_WINDOWEVENT_MOVED:
-        break;
-    case SDL_WINDOWEVENT_MINIMIZED:
-        break;
-    case SDL_WINDOWEVENT_MAXIMIZED:
-        break;
-    case SDL_WINDOWEVENT_RESTORED:
-        break;
-    case SDL_WINDOWEVENT_CLOSE:
-        break;
-    default:
-        break;
-  }
-
-  return event;
 }
 
 } // end namespace packages

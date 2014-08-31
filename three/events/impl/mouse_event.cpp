@@ -1,6 +1,3 @@
-#ifndef THREE_EVENTS_MOUSE_EVENT_CPP
-#define THREE_EVENTS_MOUSE_EVENT_CPP
-
 #include <three/events/mouse_event.h>
 
 namespace three {
@@ -11,5 +8,3 @@ namespace three {
   const EventType MouseEvent::MOUSE_WHEEL = 1103;
 
 } // end namespace three
-
-#endif // THREE_EVENTS_MOUSE_EVENT_CPP

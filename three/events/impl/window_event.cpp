@@ -1,6 +1,3 @@
-#ifndef THREE_EVENTS_WINDOW_EVENT_CPP
-#define THREE_EVENTS_WINDOW_EVENT_CPP
-
 #include <three/common.h>
 #include <three/events/window_event.h>
 
@@ -22,5 +19,3 @@ namespace three {
   const EventType WindowEvent::WINDOW_CLOSE         = 1013;
 
 } // end namespace three
-
-#endif

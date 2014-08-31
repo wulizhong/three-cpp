@@ -8,6 +8,8 @@ namespace three {
 class Event {
 public:
 
+  static const EventType UNKNOWN;
+
   virtual ~Event() {};
 
 };
