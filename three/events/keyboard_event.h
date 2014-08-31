@@ -10,17 +10,18 @@ namespace three {
 class KeyboardEvent : public InputEvent {
 public:
 
-  static const EventType KEY_PRESS;
   static const EventType KEY_UP;
   static const EventType KEY_DOWN;
 
-  KeyboardEvent( const EventType type, unsigned int timestamp, unsigned int key, 
-                 bool repeat = false )
+  KeyboardEvent( const EventType type, unsigned int timestamp, KeyCode key, 
+                 KeyMod modifiers = KEY_MOD_NONE, bool repeat = false )
     : InputEvent( type, timestamp ),
       key( key ),
+      modifiers( modifiers ),
       repeat( repeat ) {}
 
-  unsigned int key;
+  KeyCode key;
+  KeyMod modifiers;
 
   bool repeat;
 

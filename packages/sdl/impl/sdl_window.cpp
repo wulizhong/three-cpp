@@ -84,6 +84,8 @@ SdlWindow::SdlWindow( const RendererParameters& parameters )
   }
 
   eventMapper = std::unique_ptr<SdlEventMapper>(new SdlEventMapper());
+  size[0] = parameters.width;
+  size[1] = parameters.height;
 
   console().log() << "SDL initialized";
 }
@@ -163,7 +165,6 @@ bool SdlWindow::processEvents() {
 
     EventType type = eventMapper->mapEventType(sdlEvent);
     if( type == Event::UNKNOWN ) {
-      console().warn("SDL event not mapped");
       continue;
     }
 
@@ -172,6 +173,12 @@ bool SdlWindow::processEvents() {
     }
 
     switch(sdlEvent.type) {
+      case SDL_KEYDOWN:{
+      case SDL_KEYUP:
+        auto keyboardEvent = eventMapper->mapKeyboardEvent( sdlEvent, type );
+        dispatchEvent(keyboardEvent);
+        break;
+      }
       case SDL_MOUSEMOTION: {
       case SDL_MOUSEBUTTONDOWN: 
       case SDL_MOUSEBUTTONUP: 
@@ -192,6 +199,14 @@ bool SdlWindow::processEvents() {
   }
 
   return true;
+}
+
+int SdlWindow::width() const {
+  return size[0];
+}
+
+int SdlWindow::height() const {
+  return size[1];
 }
 
 } // end namespace packages

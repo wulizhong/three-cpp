@@ -2,8 +2,7 @@
 #define THREE_PACKAGES_SDL_SDL_WINDOW_H
 
 #include "three/gl.h"
-#include "three/utils/noncopyable.h"
-#include "three/core/event_dispatcher.h"
+#include "three/core/interfaces.h"
 #include "three/renderers/renderer_parameters.h"
 #include "packages/sdl/sdl_event_mapper.h"
 
@@ -17,17 +16,20 @@ using namespace three;
 
 typedef SDL_EventType SdlEventType;
 
-class SdlWindow : public three::NonCopyable, public EventDispatcher {
+class SdlWindow : public IWindow {
 public:
 
   SdlWindow( const three::RendererParameters& );
   virtual ~SdlWindow();
 
-  three::GLInterface createGLInterface();
+  virtual three::GLInterface createGLInterface();
 
   virtual void animate( Update update );
 
   virtual bool valid() const;
+
+  virtual int width() const;
+  virtual int height() const;
 
 private:
   void swapBuffers();
@@ -40,6 +42,8 @@ private:
   std::unique_ptr<SdlEventMapper> eventMapper;
 
   bool renderStats;
+
+  int size[2];
 
 };
 

@@ -3,12 +3,15 @@
 
 #include <three/fwd.h>
 #include <three/constants.h>
+#include <three/gl.h>
+#include <three/core/event_dispatcher.h>
+#include <three/utils/noncopyable.h>
 
 #include <memory>
 
 namespace three {
 
-class IFog {
+class THREE_DECL IFog {
 public:
   typedef std::shared_ptr<IFog> Ptr;
   virtual THREE::FogType type() const = 0;
@@ -33,6 +36,19 @@ public:
   virtual void update( Scene& scene, Camera& camera ) = 0;
   virtual void render( Scene& scene, Camera& camera, int width, int height ) = 0;
   virtual ~IPlugin() { }
+};
+
+class THREE_DECL IWindow : public NonCopyable, public EventDispatcher {
+public:
+
+  virtual ~IWindow() {};
+  // TODO Refactor the gl mess
+  virtual GLInterface createGLInterface();
+  virtual void animate( Update update ) = 0;
+  virtual bool valid() const = 0;
+
+  virtual int width() const = 0;
+  virtual int height() const = 0;
 };
 
 }

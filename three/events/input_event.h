@@ -9,18 +9,8 @@ namespace three {
 class InputEvent : public UiEvent {
 public:
 
-  InputEvent( const EventType type, unsigned int timestamp, bool altKey = false, 
-              bool ctrlKey = false, bool metaKey = false, bool shiftKey = false)
-  : UiEvent( type, timestamp ),
-      altKey( altKey ),
-      ctrlKey( ctrlKey ),
-      metaKey( metaKey ),
-      shiftKey( shiftKey ) {}
-
-  bool altKey;
-  bool ctrlKey;
-  bool metaKey;
-  bool shiftKey;
+  InputEvent( const EventType type, unsigned int timestamp )
+  : UiEvent( type, timestamp ) {}
 
 };
 

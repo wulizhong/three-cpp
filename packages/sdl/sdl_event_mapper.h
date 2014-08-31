@@ -1,6 +1,7 @@
 #ifndef THREE_PACKAGES_SDL_SDL_EVENT_MAPPER_H
 #define THREE_PACKAGES_SDL_SDL_EVENT_MAPPER_H
 
+#include "three/console.h"
 #include "three/utils/noncopyable.h"
 
 #include <SDL_events.h>
@@ -19,6 +20,12 @@ public:
 
     switch(sdlEvent.type) {
 
+      case SDL_KEYDOWN:
+      case SDL_KEYUP:
+        if(sdlEvent.key.state == SDL_PRESSED) {
+          return KeyboardEvent::KEY_DOWN;
+        }
+        return KeyboardEvent::KEY_UP;
       case SDL_MOUSEMOTION:
         return MouseEvent::MOUSE_MOVE;
       case SDL_MOUSEBUTTONDOWN:
@@ -63,12 +70,25 @@ public:
     return Event::UNKNOWN;
   }
 
-  inline MouseEvent mapMouseEvent( const SDL_Event& sdlEvent, const EventType type) const {
+  inline KeyboardEvent mapKeyboardEvent( const SDL_Event& sdlEvent, 
+    const EventType type) const 
+  {
+    auto event = KeyboardEvent( type, (unsigned int) sdlEvent.key.timestamp, 
+      (KeyCode) sdlEvent.key.keysym.sym, (KeyMod) sdlEvent.key.keysym.mod, 
+      sdlEvent.key.repeat != 0 );
 
+    return event;
+  }
+
+  inline MouseEvent mapMouseEvent( const SDL_Event& sdlEvent, 
+    const EventType type) const 
+  {
     // TODO Map properly
-    auto me = MouseEvent(type, sdlEvent.common.timestamp, MouseButton::NONE, sdlEvent.motion.state,
-          sdlEvent.motion.x, sdlEvent.motion.y, sdlEvent.motion.xrel, sdlEvent.motion.yrel);
-    return me;
+    auto event = MouseEvent( type, sdlEvent.common.timestamp, MouseButton::NONE, 
+      sdlEvent.motion.state, sdlEvent.motion.x, sdlEvent.motion.y, 
+      sdlEvent.motion.xrel, sdlEvent.motion.yrel );
+
+    return event;
 
     // switch(sdlEvent.type) {
 
@@ -92,9 +112,10 @@ public:
     // return Event(); 
   }
 
-  inline WindowEvent mapWindowEvent( const SDL_Event& sdlEvent, const EventType type ) const {
-
-    WindowEvent event = WindowEvent(type, (unsigned int)sdlEvent.common.timestamp);
+  inline WindowEvent mapWindowEvent( const SDL_Event& sdlEvent, 
+    const EventType type ) const 
+  {
+    WindowEvent event = WindowEvent( type, (unsigned int) sdlEvent.common.timestamp );
 
     switch (sdlEvent.window.event) {
       case SDL_WINDOWEVENT_RESIZED:

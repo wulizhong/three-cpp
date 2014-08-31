@@ -6,7 +6,7 @@
 // https://wiki.libsdl.org/SDLKeycodeLookup
 // For license see externals/sdl-*/license.txt
 
-enum {
+enum KeyCode {
   KEY_UNKNOWN = 0,
   KEY_BACKSPACE = 8,
   KEY_TAB = 9,
@@ -244,9 +244,9 @@ enum {
   KEY_EJECT = 1073742105,
   KEY_SLEEP = 1073742106,
   KEY_LAST
-} KeyCode;
+};
 
-enum {
+enum KeyMod {
   KEY_MOD_NONE = 0x0000,
   KEY_MOD_LSHIFT = 0x0001,
   KEY_MOD_RSHIFT = 0x0002,
@@ -261,7 +261,7 @@ enum {
   KEY_MOD_MODE = 0x4000,
   KEY_MOD_RESERVED = 0x8000,
   KEY_MOD_LAST
-} KeyMod;
+};
 
 #define KEY_MOVE_FORWARD (KEY_w|KEY_UP)
 #define KEY_MOVE_BACKWARD (KEY_s|KEY_DOWN)
