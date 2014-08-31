@@ -65,14 +65,19 @@ public:
 
   void removeEventListener( const EventType type, const std::shared_ptr<EventListener>& listener ) {
 
-    auto& typeListeners = listeners[ type ];
-    auto it = std::find(typeListeners.begin(), typeListeners.end(), listener);
+    auto typeListeners = listeners.find(type);
+    if(typeListeners == listeners.end()) {
+      return;
+    }
+    
+    auto& listeners = typeListeners->second;
+    auto it = std::find(listeners.begin(), listeners.end(), listener);
 
-    if( it != typeListeners.end() ) {
+    if( it != listeners.end() ) {
 
-      typeListeners.erase( it );
+      listeners.erase( it );
 
-      if( typeListeners.empty() ){
+      if( listeners.empty() ){
         removeEventListener( type );
       }
 
