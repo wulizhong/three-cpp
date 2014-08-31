@@ -13,10 +13,9 @@ install:
   - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq g++-4.8; fi
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
   - if [ "$CXX" = "g++" ]; then sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 90; fi
-  - sudo apt-get -qq install libsdl2-dev
+  - sudo apt-get -qq install wget unzip python libsdl2-dev
 
 script:
-  - mkdir build
-  - cd build
-  - cmake ..
-  - make
+  - wget https://github.com/three-x/tpm/archive/master.zip -O tpm.zip; unzip -j -o tpm.zip;
+  - ./tpm install
+  - ./tpm make

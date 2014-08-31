@@ -180,7 +180,7 @@ set(THREE_LIB three)
 three_add_library(${THREE_LIB} ${THREE_LIB_SOURCE_FILES})
 set_target_properties(${THREE_LIB} PROPERTIES COMPILE_DEFINITIONS "THREE_SOURCE")
 
-add_subdirectory(packages/sdl)
+add_subdirectory(packages/sdl2)
 
 if(THREE_BUILD_EXAMPLES)
   add_subdirectory(examples)

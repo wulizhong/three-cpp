@@ -1,0 +1,64 @@
+#!/usr/bin/env python
+
+import os
+import json
+import sys
+from subprocess import call
+
+githubAccount='https://github.com/three-x/'
+pkgsPath='packages/'
+buildDir='build'
+
+def print_help_default():
+  print ("""
+    Usage: tpm <command>
+
+    where <command> is one of:
+       install, make
+    """)
+
+def install_command():
+  try:
+    with open('./three.json') as f:
+      three = json.loads(f.read())
+      deps = three['dependencies']
+      pkgPattern = 'three-package-'
+      # Hard-coded for now
+      examples = 'three-examples'
+      for d in deps:
+        dep = str(d)
+        repo = githubAccount + dep + '.git'
+        if dep.startswith(pkgPattern):
+          dr = pkgsPath + dep.replace(pkgPattern,'')
+          call(['git', 'clone', repo, dr])
+        if dep == examples:
+          call(['git', 'clone', repo, 'examples'])
+  except ValueError:
+    print "tpm ERR Could not parse json file."
+  except IOError:
+    print "tpm WRN Could not find three.json configuration."
+
+def make_command():
+  call(['mkdir', '-p', buildDir])
+  oldPath = os.getcwd()
+  os.chdir( buildDir )
+  call(['cmake', '..'])
+  call(['make'])
+  os.chdir( oldPath )
+
+commands = {
+  'install' : install_command,
+  'make' : make_command
+}
+
+if len(sys.argv) == 1:
+  print_help_default()
+if len(sys.argv) == 2:
+  cmd = sys.argv[1]
+  if cmd in commands:
+    commands[cmd]()
+  else:
+    print "tpm WRN Unknown command '{0}'".format(cmd)
+    print_help_default()
+
+

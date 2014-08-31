@@ -1,6 +1,8 @@
+.vagrant/
 *.sublime-workspace
 *.sublime-project
 bin/
 *build*/
 lib/
-.DS_Store
+packages/
+examples/

@@ -64,38 +64,6 @@ endmacro(THREE_ADD_LIBRARY)
 # Add a library target.
 # _name The library name.
 # ARGN The source files for the library.
-macro(THREE_ADD_LIBRARY _name)
-
-  if (THREE_LIBRARY_STATIC)
-    add_library(${_name} STATIC ${ARGN})
-  else()
-    add_library(${_name} SHARED ${ARGN})
-  endif()
-
-  target_link_libraries(${_name} ${THREE_DEP_LIBS})
-
-  if(THREE_DEPENDS)
-    add_dependencies(${_name} ${THREE_DEPENDS})
-  endif()
-
-  link_if_needed(${_name})
-
-  if(NOT THREE_LIBRARY_STATIC)
-    set_target_properties(${_name} PROPERTIES COMPILE_DEFINITIONS "THREE_SOURCE")
-  endif()
-
-  if (THREE_PLATFORM_TOOLSET)
-    set_target_properties(${_name}
-      PROPERTIES
-      PLATFORM_TOOLSET "${THREE_PLATFORM_TOOLSET}")
-  endif()
-
-endmacro(THREE_ADD_LIBRARY)
-
-###############################################################################
-# Add a library target.
-# _name The library name.
-# ARGN The source files for the library.
 macro(THREE_ADD_STATIC_LIBRARY _name)
 
   add_library(${_name} STATIC ${ARGN})

@@ -43,7 +43,7 @@ public:
 
   virtual ~IWindow() {};
   // TODO Refactor the gl mess
-  virtual GLInterface createGLInterface();
+  virtual GLInterface createGLInterface() = 0;
   virtual void animate( Update update ) = 0;
   virtual bool valid() const = 0;
 
