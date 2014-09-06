@@ -5,6 +5,7 @@
   "dependencies": {
     "three-cpp": "latest",
     "three-package-sdl2": "latest",
+    "three-package-openal": "latest",
     "three-examples": "latest"
   }
 }
