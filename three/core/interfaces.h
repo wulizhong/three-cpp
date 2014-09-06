@@ -19,6 +19,21 @@ public:
   virtual ~IFog() { }
 };
 
+class THREE_DECL ISound {
+public:
+  virtual ~ISound() {}
+  virtual ISound& play() = 0;
+  virtual ISound& pause() = 0;
+  virtual ISound& stop() = 0;
+  virtual ISound& update( const Object3D& reference ) = 0;
+};
+
+class THREE_DECL ISoundManager {
+public:
+  virtual ~ISoundManager() {}
+  virtual ISound& load( const std::string& path ) = 0;
+};
+
 class THREE_DECL IGeometry {
 public:
   virtual void applyMatrix( Matrix4& ) = 0;
