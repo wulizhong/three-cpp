@@ -5,6 +5,8 @@ set(CMAKE_DEBUG_POSTFIX "d")
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 set(EXT_PROJECTS_DIR ${PROJECT_SOURCE_DIR}/externals)
 
+set(THREE_PACKAGES_PATH ${CMAKE_SOURCE_DIR}/packages)
+
 include(${PROJECT_SOURCE_DIR}/cmake/ThreeTargets.cmake)
 
 set(THREE_VERSION 0.0.1 CACHE STRING "three.cpp version")
