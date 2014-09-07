@@ -2,12 +2,16 @@
 #define THREE_CONSTANTS_H
 
 #include <string>
+#include <functional>
 
 namespace three {
 
+// TODO Types.h?
 typedef unsigned Buffer;
 
-typedef std::string EventType;
+typedef unsigned int EventType;
+
+typedef std::function<bool(float)> Update;
 
 namespace THREE {
 

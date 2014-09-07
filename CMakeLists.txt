@@ -5,12 +5,14 @@ set(CMAKE_DEBUG_POSTFIX "d")
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 set(EXT_PROJECTS_DIR ${PROJECT_SOURCE_DIR}/externals)
 
+set(THREE_PACKAGES_PATH ${CMAKE_SOURCE_DIR}/packages)
+
 include(${PROJECT_SOURCE_DIR}/cmake/ThreeTargets.cmake)
 
 set(THREE_VERSION 0.0.1 CACHE STRING "three.cpp version")
 dissect_version()
 
-set(THREE_TREAT_WARNINGS_AS_ERRORS TRUE CACHE BOOL "Treat warnings as errors")
+set(THREE_WARNINGS_AS_ERRORS TRUE CACHE BOOL "Treat warnings as errors")
 set(THREE_BUILD_EXAMPLES     TRUE CACHE BOOL "Build three.cpp examples")
 set(THREE_BUILD_TESTS        FALSE CACHE BOOL "Build three.cpp unit tests")
 set(THREE_LIBRARY_STATIC     TRUE CACHE BOOL "If building three.cpp as a library, build statically")
@@ -52,7 +54,7 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLAN
 
   set(THREE_COMMON_FLAGS "${THREE_COMMON_FLAGS} -Wall -Wno-missing-braces -Wno-unused-private-field")
 
-  if(THREE_TREAT_WARNINGS_AS_ERRORS)
+  if(THREE_WARNINGS_AS_ERRORS)
     set(THREE_COMMON_FLAGS "${THREE_COMMON_FLAGS} -Werror")
   endif()
 
@@ -170,7 +172,7 @@ if (ANDROID)
   add_definitions(-DTHREE_GLES)
 endif()
 
-# TODO Refactor, add groupings, etc
+# FIXME
 file(GLOB_RECURSE THREE_SOURCES three/*.cpp)
 file(GLOB_RECURSE THREE_HEADERS three/*.h)
 
@@ -179,6 +181,10 @@ set(THREE_LIB_SOURCE_FILES ${THREE_SOURCES} ${THREE_HEADERS})
 set(THREE_LIB three)
 three_add_library(${THREE_LIB} ${THREE_LIB_SOURCE_FILES})
 set_target_properties(${THREE_LIB} PROPERTIES COMPILE_DEFINITIONS "THREE_SOURCE")
+
+# TODO Implement three.json dependencies
+add_subdirectory(packages/sdl2)
+#add_subdirectory(packages/openal)
 
 if(THREE_BUILD_EXAMPLES)
   add_subdirectory(examples)
@@ -208,13 +214,13 @@ if(THREE_BUILD_TESTS)
   else()
     target_link_libraries(three_test
       debug ${GTEST_LIBS_DIR}/DebugLibs/libgtest.a
-      optimized ${GTEST_LIBS_DIR}/ReleaseLibs/libgtest.a
+      optimized ${GTEST_LIBS_DIR}/libgtest.a
     )
     target_link_libraries(three_test
       debug ${GTEST_LIBS_DIR}/DebugLibs/libgtest_main.a
-      optimized ${GTEST_LIBS_DIR}/ReleaseLibs/libgtest_main.a
+      optimized ${GTEST_LIBS_DIR}/libgtest_main.a
     )
   endif()
   target_link_libraries(three_test ${THREE_LIB})
-  add_test(threetest ${THREE_BINARY_PATH}/three_tests -V)
+  add_test(threetest ${THREE_BINARY_PATH}/three_test -VV)
 endif()

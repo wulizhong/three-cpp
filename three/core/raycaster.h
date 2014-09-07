@@ -8,6 +8,14 @@
 #include <three/math/ray.h>
 #include <three/core/object3d.h>
 
+// minwindef.h defines
+#ifdef near
+	#undef near
+#endif 
+#ifdef far
+	#undef far
+#endif
+
 namespace three {
 
 struct Intersect;

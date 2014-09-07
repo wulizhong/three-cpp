@@ -113,9 +113,9 @@ Vector3 TorusKnotGeometry::getPos( float u, float in_q, float in_p, float radius
   auto quOverP = in_q / in_p * u;
   auto cs = Math::cos( quOverP );
 
-  auto tx = radius * ( 2 + cs ) * 0.5 * cu;
-  auto ty = radius * ( 2 + cs ) * su * 0.5;
-  auto tz = heightScale * radius * Math::sin( quOverP ) * 0.5;
+  auto tx = radius * ( 2 + cs ) * 0.5f * cu;
+  auto ty = radius * ( 2 + cs ) * su * 0.5f;
+  auto tz = heightScale * radius * Math::sin( quOverP ) * 0.5f;
 
   return Vector3( tx, ty, tz );
 

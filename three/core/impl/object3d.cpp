@@ -240,7 +240,7 @@ void Object3D::add( const Object3D::Ptr& object ) {
   }
 
   object->parent = this;
-  object->dispatchEvent( "added" );
+  object->dispatchEvent( TargetEvent::TARGET_ADDED );
 
   children.push_back( object );
 
@@ -267,7 +267,7 @@ void Object3D::remove( const Object3D::Ptr& object ) {
     object->parent = nullptr;
     children.erase( index );
 
-    object->dispatchEvent( "removed" );
+    object->dispatchEvent( TargetEvent::TARGET_REMOVED );
 
     // remove from scene
 

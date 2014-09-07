@@ -12,7 +12,7 @@
 
 namespace three {
 
-class THREE_DECL GeometryBuffer : NonCopyable, public DefaultEventDispatcher {
+class THREE_DECL GeometryBuffer : NonCopyable, public EventDispatcher {
 public:
 
   struct THREE_DECL MorphTarget {

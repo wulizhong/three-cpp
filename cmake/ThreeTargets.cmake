@@ -64,38 +64,6 @@ endmacro(THREE_ADD_LIBRARY)
 # Add a library target.
 # _name The library name.
 # ARGN The source files for the library.
-macro(THREE_ADD_LIBRARY _name)
-
-  if (THREE_LIBRARY_STATIC)
-    add_library(${_name} STATIC ${ARGN})
-  else()
-    add_library(${_name} SHARED ${ARGN})
-  endif()
-
-  target_link_libraries(${_name} ${THREE_DEP_LIBS})
-
-  if(THREE_DEPENDS)
-    add_dependencies(${_name} ${THREE_DEPENDS})
-  endif()
-
-  link_if_needed(${_name})
-
-  if(NOT THREE_LIBRARY_STATIC)
-    set_target_properties(${_name} PROPERTIES COMPILE_DEFINITIONS "THREE_SOURCE")
-  endif()
-
-  if (THREE_PLATFORM_TOOLSET)
-    set_target_properties(${_name}
-      PROPERTIES
-      PLATFORM_TOOLSET "${THREE_PLATFORM_TOOLSET}")
-  endif()
-
-endmacro(THREE_ADD_LIBRARY)
-
-###############################################################################
-# Add a library target.
-# _name The library name.
-# ARGN The source files for the library.
 macro(THREE_ADD_STATIC_LIBRARY _name)
 
   add_library(${_name} STATIC ${ARGN})
@@ -144,6 +112,16 @@ macro(THREE_ADD_EXAMPLE _name)
   endif()
 
 endmacro(THREE_ADD_EXAMPLE)
+
+###############################################################################
+set( three_include_dirs "" CACHE INTERNAL "")
+macro(THREE_INCLUDE_DIRECTORIES _dir)
+    set(dirs "${three_include_dirs};${_dir}")
+    set(three_include_dirs ${dirs} CACHE INTERNAL "")
+	foreach(dir ${dirs})
+		include_directories(${dir})
+	endforeach()
+endmacro(THREE_INCLUDE_DIRECTORIES)
 
 ###############################################################################
 # Add compile flags to a target (because CMake doesn't provide something so
