@@ -49,9 +49,9 @@ void CircleGeometry::initialize( float radius, size_t segments, float thetaStart
 
   for ( unsigned int i = 1; i <= segments; i ++ ) {
 
-    auto v1 = (float)i;
-    auto v2 = (float)i + 1.f ;
-    auto v3 = (float)0;
+    int v1 = i;
+	int v2 = i + 1;
+	int v3 = 0;
 
     faces.push_back( Face3( v1, v2, v3, n.clone(), n.clone(), n.clone()  ) );
     faceVertexUvs[ 0 ].push_back( toArray( uvs[ i ].clone(), uvs[ i + 1 ].clone(), centerUV.clone() ) );

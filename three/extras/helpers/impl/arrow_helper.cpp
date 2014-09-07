@@ -51,15 +51,15 @@ void ArrowHelper::setDirection ( const Vector3& dir ) {
 
 void ArrowHelper::setLength ( float length ) {
 
-  auto headLength = length * 0.2;
-  auto headWidth = headLength * 0.2;
+  auto headLength = length * 0.2f;
+  auto headWidth = headLength * 0.2f;
 
   setLength( length, headLength, headWidth );
 }
 
 void ArrowHelper::setLength ( float length, float headLength ) {
 
-  auto headWidth = headLength * 0.2;
+  auto headWidth = headLength * 0.2f;
 
   setLength( length, headLength, headWidth );
 }

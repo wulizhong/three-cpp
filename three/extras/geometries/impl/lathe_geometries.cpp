@@ -55,17 +55,17 @@ void LatheGeometry::initialize( const std::vector<Vector3>& points,
 
   }
 
-  float np = (float)points.size();
+  auto np = points.size();
 
   for ( size_t i = 0; i < segments; i ++ ) {
 
     for ( size_t j = 0; j < points.size() - 1; j ++ ) {
 
-      float base = (float)j + np * (float)i;
+      auto base = j + np * i;
       auto a = base;
       auto b = base + np;
-      auto c = base + 1.f + np;
-      auto d = base + 1.f;
+      auto c = base + 1 + np;
+      auto d = base + 1;
 
       auto u0 = (float)i * inverseSegments;
       auto v0 = (float)j * inversePointLength;
