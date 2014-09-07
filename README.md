@@ -10,11 +10,10 @@ three.cpp
 
 ## Usage ##
 
-### Setup ###
-* `git clone git://github.com/three-x/three-cpp`
-* `cd three-cpp`
-* `./tpm install` (tpm requires python)
-* `./tpm make`
+### Setup using 3pm ###
+* `git clone git://github.com/three-x/3pm`
+* `3pm.py install` (3pm requires python)
+* `3pm.py make`
 
 ## Sample code ##
 

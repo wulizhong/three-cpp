@@ -61,7 +61,7 @@ template < typename T > inline T log( T t )  {
   return std::log( t );
 }
 template < typename T, typename U > inline T pow( T a, U b )   {
-  return std::pow( a, b );
+  return (T)std::pow(a, b);
 }
 template < typename T > inline T degToRad( T a )   {
   return a * MATH_DEG_TO_RAD_FACTOR;

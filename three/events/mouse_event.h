@@ -24,8 +24,8 @@ public:
   static const EventType MOUSE_WHEEL;
 
   MouseEvent( const EventType type, unsigned int timestamp, MouseButton button, 
-              unsigned char buttons, float screenX, float screenY, 
-              float movementX = 0.f, float movementY = 0.f )
+	  unsigned char buttons, int screenX, int screenY,
+	  int movementX = 0, int movementY = 0)
     : InputEvent( type, timestamp ),
       button( button ),
       buttons( buttons ),
@@ -38,11 +38,11 @@ public:
 
   unsigned char buttons;
 
-  float screenX;
-  float screenY;
+  int screenX;
+  int screenY;
 
-  float movementX;
-  float movementY;
+  int movementX;
+  int movementY;
 
 };
 

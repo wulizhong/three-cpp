@@ -39,9 +39,9 @@ void PolyhedronGeometry::initialize( std::vector<std::array<float,3>> verticesIn
     
   for ( size_t i = 0; i < facesIn.size(); i ++ ) {
 
-    auto v1 = indexedVertices[ facesIn[ i ][ 0 ] ];
-    auto v2 = indexedVertices[ facesIn[ i ][ 1 ] ];
-    auto v3 = indexedVertices[ facesIn[ i ][ 2 ] ];
+    auto v1 = indexedVertices[ (int)facesIn[ i ][ 0 ] ];
+	auto v2 = indexedVertices[ (int)facesIn[i][1]];
+	auto v3 = indexedVertices[ (int)facesIn[i][2]];
 
     f.push_back( Face3( v1.index, v2.index, v3.index, v1.vector.clone(), v2.vector.clone(), v3.vector.clone() ) );
 
@@ -144,7 +144,7 @@ void PolyhedronGeometry::make( const IndexedVertex& v1, const IndexedVertex& v2,
 // Analytically subdivide a face to the required detail level.
 void PolyhedronGeometry::subdivide( const Face3& face, int detail ) {
 
-  auto cols = Math::pow( 2, (int)detail );
+  auto cols = (int)Math::pow( 2, (int)detail );
   //auto cells = Math::pow( 4, (int)detail );
   auto a = prepare( this->vertices[ face.a ] );
   auto b = prepare( this->vertices[ face.b ] );
@@ -183,7 +183,7 @@ void PolyhedronGeometry::subdivide( const Face3& face, int detail ) {
 
     for ( int j = 0; j < 2 * (cols - i) - 1; j ++ ) {
 
-      int k = Math::floor( j / 2.f );
+      int k = (int)Math::floor( j / 2.f );
 
       if ( j % 2 == 0 ) {
 
