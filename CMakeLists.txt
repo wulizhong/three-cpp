@@ -184,7 +184,7 @@ set_target_properties(${THREE_LIB} PROPERTIES COMPILE_DEFINITIONS "THREE_SOURCE"
 
 # TODO Implement three.json dependencies
 add_subdirectory(packages/sdl2)
-add_subdirectory(packages/openal)
+#add_subdirectory(packages/openal)
 
 if(THREE_BUILD_EXAMPLES)
   add_subdirectory(examples)
