@@ -12,7 +12,7 @@ three.cpp
 
 ### Setup using 3pm ###
 * `git clone git://github.com/three-x/3pm`
-* `3pm.py install` (3pm requires python)
+* `3pm.py install` (3pm requires cmake and python)
 * `3pm.py make`
 
 ## Sample code ##
