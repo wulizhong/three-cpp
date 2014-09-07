@@ -114,6 +114,16 @@ macro(THREE_ADD_EXAMPLE _name)
 endmacro(THREE_ADD_EXAMPLE)
 
 ###############################################################################
+set( three_include_dirs "" CACHE INTERNAL "")
+macro(THREE_INCLUDE_DIRECTORIES _dir)
+    set(dirs "${three_include_dirs};${_dir}")
+    set(three_include_dirs ${dirs} CACHE INTERNAL "")
+	foreach(dir ${dirs})
+		include_directories(${dir})
+	endforeach()
+endmacro(THREE_INCLUDE_DIRECTORIES)
+
+###############################################################################
 # Add compile flags to a target (because CMake doesn't provide something so
 # common itself).
 # _name The target name.
