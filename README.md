@@ -15,8 +15,8 @@ three.cpp
 ### Setup using 3pm ###
 * `git clone git://github.com/three-x/3pm three`
 * `cd three`
-* `3pm.py install` (3pm requires cmake and python)
-* `3pm.py make`
+* `3pm install` (3pm requires cmake and python)
+* `3pm make`
 
 ## Dependencies ##
 * Git
@@ -81,21 +81,21 @@ void scene() {
 
 ## Working examples ##
 
-<img src="https://raw.github.com/three-x/three-cpp/master/data/thumbs/webgl_custom_attributes_particles.png">
-<img src="https://raw.github.com/three-x/three-cpp/master/data/thumbs/webgl_custom_attributes_particles2.png">
-<img src="https://raw.github.com/three-x/three-cpp/master/data/thumbs/webgl_custom_attributes_particles3.png">
-<img src="https://raw.github.com/three-x/three-cpp/master/data/thumbs/webgl_geometry_hierarchy.png">
-<img src="https://raw.github.com/three-x/three-cpp/master/data/thumbs/webgl_geometry_hierarchy2.png">
-<img src="https://raw.github.com/three-x/three-cpp/master/data/thumbs/webgl_geometry_minecraft.png">
-<img src="https://raw.github.com/three-x/three-cpp/master/data/thumbs/webgl_lines_colors.png">
-<img src="https://raw.github.com/three-x/three-cpp/master/data/thumbs/webgl_lines_cubes.png">
-<img src="https://raw.github.com/three-x/three-cpp/master/data/thumbs/webgl_lines_sphere.png">
-<img src="https://raw.github.com/three-x/three-cpp/master/data/thumbs/webgl_particles_billboards.png">
-<img src="https://raw.github.com/three-x/three-cpp/master/data/thumbs/webgl_particles_billboards_colors.png">
-<img src="https://raw.github.com/three-x/three-cpp/master/data/thumbs/webgl_particles_random.png">
-<img src="https://raw.github.com/three-x/three-cpp/master/data/thumbs/webgl_particles_sprites.png">
-<img src="https://raw.github.com/three-x/three-cpp/master/data/thumbs/webgl_shader.png">
-<img src="https://raw.github.com/three-x/three-cpp/master/data/thumbs/webgl_shader2.png">
-<img src="https://raw.github.com/three-x/three-cpp/master/data/thumbs/webgl_shader_lava.png">
-<img src="https://raw.github.com/three-x/three-cpp/master/data/thumbs/webgl_test_memory.png">
+<img src="https://raw.github.com/three-x/three-examples/master/data/thumbs/webgl_custom_attributes_particles.png">
+<img src="https://raw.github.com/three-x/three-examples/master/data/thumbs/webgl_custom_attributes_particles2.png">
+<img src="https://raw.github.com/three-x/three-examples/master/data/thumbs/webgl_custom_attributes_particles3.png">
+<img src="https://raw.github.com/three-x/three-examples/master/data/thumbs/webgl_geometry_hierarchy.png">
+<img src="https://raw.github.com/three-x/three-examples/master/data/thumbs/webgl_geometry_hierarchy2.png">
+<img src="https://raw.github.com/three-x/three-examples/master/data/thumbs/webgl_geometry_minecraft.png">
+<img src="https://raw.github.com/three-x/three-examples/master/data/thumbs/webgl_lines_colors.png">
+<img src="https://raw.github.com/three-x/three-examples/master/data/thumbs/webgl_lines_cubes.png">
+<img src="https://raw.github.com/three-x/three-examples/master/data/thumbs/webgl_lines_sphere.png">
+<img src="https://raw.github.com/three-x/three-examples/master/data/thumbs/webgl_particles_billboards.png">
+<img src="https://raw.github.com/three-x/three-examples/master/data/thumbs/webgl_particles_billboards_colors.png">
+<img src="https://raw.github.com/three-x/three-examples/master/data/thumbs/webgl_particles_random.png">
+<img src="https://raw.github.com/three-x/three-examples/master/data/thumbs/webgl_particles_sprites.png">
+<img src="https://raw.github.com/three-x/three-examples/master/data/thumbs/webgl_shader.png">
+<img src="https://raw.github.com/three-x/three-examples/master/data/thumbs/webgl_shader2.png">
+<img src="https://raw.github.com/three-x/three-examples/master/data/thumbs/webgl_shader_lava.png">
+<img src="https://raw.github.com/three-x/three-examples/master/data/thumbs/webgl_test_memory.png">
 
