@@ -16,6 +16,6 @@ install:
   - sudo apt-get -qq install wget unzip python libsdl2-dev
 
 script:
-  - wget https://github.com/three-x/tpm/archive/master.zip -O tpm.zip; unzip -j -o tpm.zip;
-  - ./tpm install
-  - ./tpm make
+  - wget https://github.com/three-x/3pm/archive/master.zip -O tpm.zip; unzip -j -o tpm.zip;
+  - ./3pm install
+  - ./3pm make

@@ -1,11 +1,8 @@
 {
-  "name": "three-x",
+  "name": "three-cpp",
   "private": true,
   "version": "0.0.0",
   "dependencies": {
-    "three-cpp": "latest",
-    "three-package-sdl2": "latest",
-    "three-package-openal": "latest",
-    "three-examples": "latest"
+    "three-package-googletest": "master"
   }
 }
