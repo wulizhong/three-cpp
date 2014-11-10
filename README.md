@@ -12,11 +12,12 @@ three.cpp
 
 ## Usage ##
 
-### Setup using 3pm ###
-* `git clone git://github.com/three-x/3pm three`
+### Setup using 3pm (requires cmake and python installed) ###
+* `download and unzip https://github.com/three-x/3pm/archive/master.zip`
+* `mkdir three`
 * `cd three`
-* `3pm.py install` (3pm requires cmake and python)
-* `3pm.py make`
+* `../3pm install` 
+* `../3pm make`
 
 ## Dependencies ##
 * Git
